@@ -5,19 +5,19 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // MongoDB URI from environment variables
-const uri = process.env.MONGO_URI;
+const uri = "mongodb://localhost:27017/farmpreneur";
 
 // Connect to MongoDB using Mongoose
 const connectDB = async () => {
-    try {
-      await mongoose.connect(process.env.MONGO_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-      });
-      console.log('MongoDB connected');
-    } catch (err) {
-      console.error('Error connecting to MongoDB:', err.message);
-    }
-  };
+  try {
+    await mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+    console.log('MongoDB connected');
+  } catch (err) {
+    console.error('Error connecting to MongoDB:', err.message);
+  }
+};
 
 module.exports = connectDB;
