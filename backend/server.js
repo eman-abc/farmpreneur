@@ -1,14 +1,13 @@
 const dotenv = require('dotenv');
 dotenv.config(); // Load environment variables
-
 const express = require('express');
-const mongoose = require('mongoose');
-const uri = process.env.MONGO_URI;  // Access MONGO_URI from environment variables
 const cors = require('cors');
 const connectDB = require('./db');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const authRoutes = require('./routes/authRoutes'); // Import the login routes
+const mentorshipRoutes = require('./routes/mentorshipRoutes');
 
+const mentorshipTopicRoutes = require('./routes/mentorshipTopicRoutes');
 // Connect to the database
 connectDB();
 
@@ -24,7 +23,6 @@ app.use(session({
 }));
 
 // Middleware
-// Middleware
 app.use(cors({
   origin: 'http://localhost:3000', // Allow your frontend to make requests to the backend
   credentials: true // Allow cookies to be sent with requests
@@ -37,6 +35,13 @@ app.use('/api', authRoutes);  // Login route will now be available under /api/lo
 // Register dashboard routes
 app.use('/api/dashboard', dashboardRoutes);
 
+// Register the mentorship routes
+app.use('/api/mentorship', mentorshipRoutes);
+
+// Register the mentorship routes
+app.use('/api/mentor/mentorship-topics', mentorshipTopicRoutes);
+
+//testing 
 // Test route to verify server is running
 app.get('/', (req, res) => {
   res.send('API is running...');
@@ -46,16 +51,6 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-});
-
-// Database test route
-app.get('/test-db', async (req, res) => {
-  try {
-    const result = await mongoose.connection.db.collection('user').findOne({});
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching data from database', error });
-  }
 });
 
 // Generic error handling middleware

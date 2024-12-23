@@ -1,7 +1,10 @@
+// axiosInstance.js
 import axios from 'axios';
 
-const instance = axios.create({
-    baseURL: '/api',  // The base URL is the API endpoint
+// Create an Axios instance with the base URL
+const axiosInstance = axios.create({
+  baseURL: 'http://localhost:5000/api',  // Set the base URL for your API
+  withCredentials: true  // Automatically include credentials (cookies) with each request
 });
 
-export default instance;
+export default axiosInstance;

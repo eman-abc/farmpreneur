@@ -1,101 +1,72 @@
-// import React, { useEffect, useState } from 'react';
-// import { Container, Row, Col, Card, Button } from 'react-bootstrap';
-// import UserProfile from '../components/Dashboard/UserProfile'; // Show user details
-// import ProductList from '../components/Dashboard/ProductList'; // For users to see their products
-// import MentorshipList from '../components/Dashboard/MentorshipList'; // For mentors to see mentorships
-// import ResourceManagement from '../components/ResourceManagement'; // For NGOs to upload resources
+import React, { useEffect, useState } from 'react';
+import axios from '../api/axios'; // Import the custom axios instance
+import UserProfile from '../components/UserProfile'; // Adjust the path based on your file structure
+import EntrepreneurDashboard from '../components/EnterpreneurDashboard';
+import MentorDashboard from '../components/MentorDashboard';
 
-// const DashboardPage = () => {
-//     const [userData, setUserData] = useState(null);
-//     const [role, setRole] = useState(null); // 'user', 'mentor', 'ngo'
+const DashboardPage = () => {
+    const [userData, setUserData] = useState(null); // State to store user data
+    const [loading, setLoading] = useState(true); // State to handle loading
+    const [error, setError] = useState(null); // State to handle errors
 
-//     useEffect(() => {
-//         const fetchDashboardData = async () => {
-//             const token = localStorage.getItem('authToken'); // Retrieve token from localStorage
-//             if (!token) {
-//                 console.error('No token found');
-//                 return;
-//             }
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            try {
+                // Use the custom axios instance to fetch data
+                const response = await axios.get('/dashboard'); // Just use the path part, baseURL is already set
+                setUserData(response.data.user); // Set user data from the response
+            } catch (err) {
+                setError(err.response?.data?.message || err.message); // Handle errors
+            } finally {
+                setLoading(false); // Stop loading after the request is done
+            }
+        };
 
-//             try {
-//                 const res = await fetch('/api/dashboard', {
-//                     headers: {
-//                         Authorization: `Bearer ${token}`, // Attach token to headers
-//                     },
-//                 });
-//                 const data = await res.json();
-//                 setUserData(data.user); // Set user data
-//                 setRole(data.role); // Set role
-//             } catch (err) {
-//                 console.error(err);
-//             }
-//         };
+        fetchDashboardData();
+    }, []);
 
-//         fetchDashboardData();
-//     }, []);
+    if (loading) return <div>Loading...</div>; // Show loading spinner/message
+    if (error) return <div>Error: {error}</div>; // Display error messages
+    if (!userData) return <div>Error: Unable to load user data</div>; // Fallback in case of unexpected issues
 
-
-//     if (!userData) return <div>Loading...</div>;
-
-//     return (
-//         <Container>
-//             <Row>
-//                 <Col md={4}>
-//                     <Card>
-//                         <Card.Body>
-//                             <Card.Title>User Profile</Card.Title>
-//                             <UserProfile user={userData} />
-//                         </Card.Body>
-//                     </Card>
-//                 </Col>
-//                 <Col md={8}>
-//                     {role === 'user' && (
-//                         <Card>
-//                             <Card.Body>
-//                                 <Card.Title>Your Products</Card.Title>
-//                                 <ProductList products={userData.products} />
-//                                 <Button className="mt-3">Add New Product</Button>
-//                             </Card.Body>
-//                         </Card>
-//                     )}
-//                     {role === 'mentor' && (
-//                         <Card>
-//                             <Card.Body>
-//                                 <Card.Title>Your Mentorships</Card.Title>
-//                                 <MentorshipList mentorships={userData.mentorships} />
-//                             </Card.Body>
-//                         </Card>
-//                     )}
-//                     {role === 'ngo' && (
-//                         <Card>
-//                             <Card.Body>
-//                                 <Card.Title>Manage Resources</Card.Title>
-//                                 <ResourceManagement resources={userData.resources} />
-//                                 <Button className="mt-3">Upload New Resource</Button>
-//                             </Card.Body>
-//                         </Card>
-//                     )}
-//                 </Col>
-//             </Row>
-//         </Container>
-//     );
-// };
-
-// export default DashboardPage;
-
-
-const DashboardPage = ({ data }) => {
     return (
         <div>
-            <h1>Welcome, {data.user.name}</h1>
-            <p>Email: {data.user.email}</p>
-            <p>Role: {data.user.role}</p>
-            <p>Location: {data.user.location}</p>
-            <img src={data.user.profileImage} alt="Profile" />
-            {/* Render other details as needed */}
+            <h1>Dashboard</h1>
+            <UserProfile user={userData} /> {/* Pass user data to the UserProfile component */}
+
+            {/* Entrepreneur Dashboard */}
+            {userData.role === 'Entrepreneur' && (
+                <div>
+                    <EntrepreneurDashboard />
+                </div>
+            )}
+
+            {/* Mentor Dashboard */}
+            {userData.role === 'Mentor' && (
+                <div>
+                    <h2>Your Mentorship Topics</h2>
+                    <ul>
+                        {/* Example: Replace with real data */}
+                        <li>Mentorship A</li>
+                    </ul>
+                    <div>
+                        <MentorDashboard />
+                    </div>
+                </div>
+            )}
+
+            {/* NGO Dashboard */}
+            {userData.role === 'ngo' && (
+                <div>
+                    <h2>Available Resources</h2>
+                    <ul>
+                        {/* Example: Replace with real data */}
+                        <li>Resource A</li>
+                    </ul>
+                </div>
+            )}
         </div>
     );
 };
 
 export default DashboardPage;
-

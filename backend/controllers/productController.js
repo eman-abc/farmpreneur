@@ -62,3 +62,21 @@ exports.deleteProduct = async (req, res) => {
     res.status(500).json({ message: 'Error deleting product', error: err.message });
   }
 };
+
+
+
+exports.getEntrepreneurProducts = async (req, res) => {
+  try {
+    // Fetch products for the logged-in entrepreneur based on their userId (ownerId)
+    const products = await Product.find({ ownerId: req.session.user._id });
+
+    if (!products) {
+      return res.status(404).json({ message: 'No products found for this entrepreneur.' });
+    }
+
+    res.status(200).json({ products });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error fetching products.' });
+  }
+};

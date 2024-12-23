@@ -12,7 +12,7 @@ const App = () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email: 'inaya@example.com', password: 'password123' }),
+            body: JSON.stringify({ email: 'sara@example.com', password: 'password123' }),
             credentials: 'include', // Ensure session cookies are sent
         })
 

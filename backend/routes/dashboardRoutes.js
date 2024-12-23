@@ -1,8 +1,8 @@
 // dashboardRoutes.js
 const express = require('express');
 const authMiddleware = require('../middleware/authMiddleware');
-const User = require('../models/User');
 const router = express.Router();
+const productController = require('../controllers/productController');  // Import productController
 
 router.get('/', authMiddleware, (req, res) => {
     console.log('INSIDE DASHBOARD roUTE.JS BACKEND')
@@ -26,5 +26,9 @@ router.get('/', authMiddleware, (req, res) => {
 
     res.json(responseData);
 });
+
+// Entrepreneur Products Route
+router.get('/entrepreneur/products', productController.getEntrepreneurProducts);  // Ensure this route is defined
+
 
 module.exports = router;
