@@ -3,11 +3,14 @@ import axios from '../api/axios'; // Import the custom axios instance
 import UserProfile from '../components/UserProfile'; // Adjust the path based on your file structure
 import EntrepreneurDashboard from '../components/EnterpreneurDashboard';
 import MentorDashboard from '../components/MentorDashboard';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 
 const DashboardPage = () => {
     const [userData, setUserData] = useState(null); // State to store user data
     const [loading, setLoading] = useState(true); // State to handle loading
     const [error, setError] = useState(null); // State to handle errors
+    const navigate = useNavigate(); // Initialize useNavigate hook for redirection
+
 
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -17,13 +20,19 @@ const DashboardPage = () => {
                 setUserData(response.data.user); // Set user data from the response
             } catch (err) {
                 setError(err.response?.data?.message || err.message); // Handle errors
+                // Check if the error message is unauthorized (401)
+                if (err.response?.status === 401) {
+                    // Redirect to the login page
+                    navigate('/login'); // You can replace '/login' with the correct path of your login page
+                }
             } finally {
                 setLoading(false); // Stop loading after the request is done
             }
         };
 
         fetchDashboardData();
-    }, []);
+    },  [navigate]);
+    
 
     if (loading) return <div>Loading...</div>; // Show loading spinner/message
     if (error) return <div>Error: {error}</div>; // Display error messages
@@ -44,11 +53,6 @@ const DashboardPage = () => {
             {/* Mentor Dashboard */}
             {userData.role === 'Mentor' && (
                 <div>
-                    <h2>Your Mentorship Topics</h2>
-                    <ul>
-                        {/* Example: Replace with real data */}
-                        <li>Mentorship A</li>
-                    </ul>
                     <div>
                         <MentorDashboard />
                     </div>

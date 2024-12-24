@@ -2,254 +2,314 @@ import React, { useEffect, useState } from 'react';
 import axios from '../api/axios'; // Assuming you have a custom axios instance
 
 const MentorDashboard = () => {
-    const [mentorshipTopics, setMentorshipTopics] = useState([]);
     const [mentorshipSessions, setMentorshipSessions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [newSessionData, setNewSessionData] = useState({
-        menteeId: '',
-        schedule: '',
-        feedback: '',
-    });
 
-    // New topic form state
-    const [newTopicData, setNewTopicData] = useState({
-        title: '',
-        description: '',
-        category: '', // New field for category selection
-    });
-
-    // Edit form state
-    const [editTopicData, setEditTopicData] = useState({
-        id: '',
+    const [newTopic, setNewTopic] = useState({
         title: '',
         description: '',
         category: '',
     });
+    const [editTopicId, setEditTopicId] = useState(null);
+    const [mentorshipTopics, setMentorshipTopics] = useState([]);
 
+    const mentorId = 'loggedInMentorId'; // Replace with actual logged-in mentor ID
+
+    const [feedbackData, setFeedbackData] = useState({
+        sessionId: '',
+        feedback: '',
+    });
+
+    const [rescheduleData, setRescheduleData] = useState({
+        sessionId: '',
+        newSchedule: '',
+    });
+
+    const [topicsData, setTopicsData] = useState({
+        sessionId: '',
+        topics: [],
+    });
+
+    // Fetch all mentorship sessions for the mentor
     useEffect(() => {
-        const fetchMentorData = async () => {
-            try {
-                // Fetch mentorship topics
-                const topicsResponse = await axios.get('/mentor/mentorship-topics');
-                setMentorshipTopics(topicsResponse.data);
 
-                // Fetch mentorship sessions
-                const sessionsResponse = await axios.get('/mentorship/mentor/sessions');
-                setMentorshipSessions(sessionsResponse.data);
+        const fetchMentorshipTopics = async () => {
+            try {
+                const response = await axios.get(`/mentorship/topics`);
+                setMentorshipTopics(response.data);
             } catch (err) {
-                setError('Error fetching mentor data');
+                setError('Error fetching mentorship topics');
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchMentorData();
+        const fetchSessions = async () => {
+            try {
+                const response = await axios.get('/mentorship/mentor/sessions');
+                setMentorshipSessions(response.data);
+            } catch (err) {
+                setError('Error fetching mentorship sessions');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchMentorshipTopics();
+        fetchSessions();
+    }, [mentorId]);
+
+    // Approve a session
+    const handleApproveSession = async (sessionId) => {
+        try {
+            const response = await axios.patch(`/mentorship/sessions/${sessionId}`, {
+                status: 'Approved',
+            });
+            setMentorshipSessions((prev) =>
+                prev.map((session) =>
+                    session._id === sessionId ? { ...session, status: 'Approved' } : session
+                )
+            );
+        } catch (err) {
+            setError('Error approving session');
+        }
+    };
+
+    // Complete a session and add mentor feedback
+    const handleCompleteSession = async (e) => {
+        e.preventDefault();
+        try {
+            const { sessionId, feedback } = feedbackData;
+            const response = await axios.patch(`/mentorship/sessions/${sessionId}`, {
+                status: 'Completed',
+                mentorFeedback: feedback,
+            });
+            setMentorshipSessions((prev) =>
+                prev.map((session) =>
+                    session._id === sessionId ? { ...session, status: 'Completed', mentorFeedback: feedback } : session
+                )
+            );
+            setFeedbackData({ sessionId: '', feedback: '' });
+        } catch (err) {
+            setError('Error completing session');
+        }
+    };
+
+    // Reschedule a session
+    const handleRescheduleSession = async (sessionId) => {
+        try {
+            const { newSchedule } = rescheduleData;
+            const response = await axios.patch(`/mentorship/sessions/${sessionId}`, {
+                schedule: newSchedule,
+                status: 'Pending', // Reschedule the session to "Pending"
+            });
+            setMentorshipSessions((prev) =>
+                prev.map((session) =>
+                    session._id === sessionId ? { ...session, schedule: newSchedule, status: 'Pending' } : session
+                )
+            );
+            setRescheduleData({ sessionId: '', newSchedule: '' });
+        } catch (err) {
+            setError('Error rescheduling session');
+        }
+    };
+
+    // Update session topics
+    const handleUpdateTopics = async (sessionId) => {
+        try {
+            const { topics } = topicsData;
+            const response = await axios.patch(`/mentorship/sessions/${sessionId}`, {
+                topics: topics,
+            });
+            setMentorshipSessions((prev) =>
+                prev.map((session) =>
+                    session._id === sessionId ? { ...session, topics: topics } : session
+                )
+            );
+            setTopicsData({ sessionId: '', topics: [] });
+        } catch (err) {
+            setError('Error updating session topics');
+        }
+    };
+
+    // Fetch mentorship topics
+    useEffect(() => {
+        const fetchMentorshipTopics = async () => {
+            try {
+                const response = await axios.get(`/topics`);
+                setMentorshipTopics(response.data);
+            } catch (err) {
+                setError('Error fetching mentorship topics');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchMentorshipTopics();
     }, []);
 
-    const handleSessionSubmit = async (e) => {
-        e.preventDefault();
+    // Add new topic
+    const handleAddTopic = async () => {
         try {
-            const { menteeId, schedule, feedback } = newSessionData;
-            const newSession = await axios.post('/mentorship/mentor/sessions', {
-                menteeId,
-                schedule,
-                feedback,
+            const response = await axios.post('/topics', {
+                ...newTopic,
+                mentor: mentorId,
             });
-            setMentorshipSessions((prev) => [...prev, newSession.data]);
-            setNewSessionData({ menteeId: '', schedule: '', feedback: '' }); // Reset form data
+            setMentorshipTopics([...mentorshipTopics, response.data]);
+            setNewTopic({ title: '', description: '', category: '' });
         } catch (err) {
-            setError('Error scheduling new session');
+            setError('Error adding topic');
         }
     };
 
-    const handleTopicSubmit = async (e) => {
-        e.preventDefault();
+    // Remove topic
+    const handleRemoveTopic = async (topicId) => {
         try {
-            const { title, description, category } = newTopicData;
-            const newTopic = await axios.post('/mentor/mentorship-topics', {
-                title,
-                description,
-                category,
-            });
-            setMentorshipTopics((prev) => [...prev, newTopic.data]); // Update topics list with the new topic
-            setNewTopicData({ title: '', description: '', category: '' }); // Reset the new topic form
+            await axios.delete(`/topics/${topicId}`);
+            setMentorshipTopics(mentorshipTopics.filter((topic) => topic._id !== topicId));
         } catch (err) {
-            setError('Error adding new topic');
+            setError('Error removing topic');
         }
     };
 
-    const handleTopicDelete = async (topicId) => {
+    const handleEditTopic = async () => {
         try {
-            await axios.delete(`/mentor/mentorship-topics/${topicId}`);
-            setMentorshipTopics(mentorshipTopics.filter(topic => topic._id !== topicId)); // Remove deleted topic from list
-        } catch (err) {
-            setError('Error deleting topic');
-        }
-    };
-
-    const handleTopicEdit = async (e) => {
-        e.preventDefault();
-        const { title, description, category } = editTopicData;
-        try {
-            const updatedTopic = await axios.put(`/mentor/mentorship-topics/${editTopicData.id}`, {
-                title,
-                description,
-                category,
-            });
-            setMentorshipTopics(mentorshipTopics.map(topic => 
-                topic._id === updatedTopic.data._id ? updatedTopic.data : topic
+            const response = await axios.put(`/topics/${editTopicId}`, newTopic);
+            setMentorshipTopics(mentorshipTopics.map((topic) =>
+                topic._id === editTopicId ? response.data : topic
             ));
-            setEditTopicData({ id: '', title: '', description: '', category: '' }); // Reset the form
+            setEditTopicId(null);
+            setNewTopic({ title: '', description: '', category: '' });
         } catch (err) {
-            setError('Error updating topic');
+            setError(err.response?.data?.message || 'Error editing topic');
         }
     };
-
-    const handleEditClick = (topic) => {
-        setEditTopicData({
-            id: topic._id,
-            title: topic.title,
-            description: topic.description,
-            category: topic.category,
-        });
-    };
+    
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>{error}</div>;
 
     return (
         <div>
-            <h2>Your Mentor Dashboard</h2>
+            <h2>Your Mentorship Topics</h2>
 
-            {/* Mentorship Topics */}
-            <div>
-                <h3>Your Mentorship Topics</h3>
-                <ul>
-                    {mentorshipTopics.map((topic) => (
-                        <li key={topic._id}>
-                            {topic.title} - {topic.description} ({topic.category})
-                            <button onClick={() => handleEditClick(topic)}>Edit</button>
-                            <button onClick={() => handleTopicDelete(topic._id)}>Delete</button>
-                        </li>
-                    ))}
-                </ul>
-
-                {/* Add New Topic Form */}
-                <h4>Add New Mentorship Topic</h4>
-                <form onSubmit={handleTopicSubmit}>
-                    <input
-                        type="text"
-                        placeholder="Title"
-                        value={newTopicData.title}
-                        onChange={(e) => setNewTopicData({ ...newTopicData, title: e.target.value })}
-                        required
-                    />
-                    <textarea
-                        placeholder="Description"
-                        value={newTopicData.description}
-                        onChange={(e) => setNewTopicData({ ...newTopicData, description: e.target.value })}
-                        required
-                    />
-                    <select
-                        value={newTopicData.category}
-                        onChange={(e) => setNewTopicData({ ...newTopicData, category: e.target.value })}
-                        required
-                    >
-                        <option value="">Select Category</option>
-                        <option value="Agriculture & Farming">Agriculture & Farming</option>
-                        <option value="Handicrafts & Artisan Work">Handicrafts & Artisan Work</option>
-                        <option value="Business & Marketing">Business & Marketing</option>
-                        <option value="Financial Literacy">Financial Literacy</option>
-                        <option value="E-Commerce & Online Business">E-Commerce & Online Business</option>
-                        <option value="Health & Wellness">Health & Wellness</option>
-                        <option value="Leadership & Empowerment">Leadership & Empowerment</option>
-                        <option value="Sustainability & Environment">Sustainability & Environment</option>
-                        <option value="Technology for Women Entrepreneurs">Technology for Women Entrepreneurs</option>
-                    </select>
-                    <button type="submit">Add Topic</button>
-                </form>
-
-                {/* Edit Topic Form */}
-                {editTopicData.id && (
-                    <div>
-                        <h4>Edit Mentorship Topic</h4>
-                        <form onSubmit={handleTopicEdit}>
-                            <input
-                                type="text"
-                                placeholder="Title"
-                                value={editTopicData.title}
-                                onChange={(e) => setEditTopicData({ ...editTopicData, title: e.target.value })}
-                                required
-                            />
-                            <textarea
-                                placeholder="Description"
-                                value={editTopicData.description}
-                                onChange={(e) => setEditTopicData({ ...editTopicData, description: e.target.value })}
-                                required
-                            />
-                            <select
-                                value={editTopicData.category}
-                                onChange={(e) => setEditTopicData({ ...editTopicData, category: e.target.value })}
-                                required
-                            >
-                                <option value="">Select Category</option>
-                                <option value="Agriculture & Farming">Agriculture & Farming</option>
-                                <option value="Handicrafts & Artisan Work">Handicrafts & Artisan Work</option>
-                                <option value="Business & Marketing">Business & Marketing</option>
-                                <option value="Financial Literacy">Financial Literacy</option>
-                                <option value="E-Commerce & Online Business">E-Commerce & Online Business</option>
-                                <option value="Health & Wellness">Health & Wellness</option>
-                                <option value="Leadership & Empowerment">Leadership & Empowerment</option>
-                                <option value="Sustainability & Environment">Sustainability & Environment</option>
-                                <option value="Technology for Women Entrepreneurs">Technology for Women Entrepreneurs</option>
-                            </select>
-                            <button type="submit">Update Topic</button>
-                        </form>
+            <div className="row mb-4">
+                {mentorshipTopics.map((topic) => (
+                    <div className="col-md-4 mb-3" key={topic._id}>
+                        <div className="card">
+                            <div className="card-body">
+                                <h5 className="card-title">{topic.title}</h5>
+                                <p className="card-text">{topic.description}</p>
+                                <p className="card-text">
+                                    <small className="text-muted">Category: {topic.category}</small>
+                                </p>
+                                <button
+                                    className="btn btn-warning me-2"
+                                    onClick={() => {
+                                        setEditTopicId(topic._id);
+                                        setNewTopic({
+                                            title: topic.title,
+                                            description: topic.description,
+                                            category: topic.category,
+                                        });
+                                    }}
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    className="btn btn-danger"
+                                    onClick={() => handleRemoveTopic(topic._id)}
+                                >
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                )}
+                ))}
             </div>
 
-            {/* Mentorship Sessions */}
-            <div>
-                <h3>Your Mentorship Sessions</h3>
-                <ul>
-                    {mentorshipSessions.map((session) => (
-                        <li key={session._id}>
-                            <strong>{session.menteeId.name}</strong> - {new Date(session.schedule).toLocaleString()}
-                            <div>Status: {session.status}</div>
-                            {session.status === 'Completed' && <div>Feedback: {session.feedback}</div>}
-                            <button>View Details</button>
-                        </li>
-                    ))}
-                </ul>
+            <h3>{editTopicId ? 'Edit Topic' : 'Add New Topic'}</h3>
+            <div className="mb-3">
+                <input
+                    type="text"
+                    className="form-control mb-2"
+                    placeholder="Title"
+                    value={newTopic.title}
+                    onChange={(e) => setNewTopic({ ...newTopic, title: e.target.value })}
+                />
+                <textarea
+                    className="form-control mb-2"
+                    placeholder="Description"
+                    value={newTopic.description}
+                    onChange={(e) => setNewTopic({ ...newTopic, description: e.target.value })}
+                ></textarea>
+                <select
+                    className="form-select mb-2"
+                    value={newTopic.category}
+                    onChange={(e) => setNewTopic({ ...newTopic, category: e.target.value })}
+                >
+                    <option value="">Select Category</option>
+                    <option value="Agriculture & Farming">Agriculture & Farming</option>
+                    <option value="Handicrafts & Artisan Work">Handicrafts & Artisan Work</option>
+                    <option value="Business & Marketing">Business & Marketing</option>
+                    <option value="Financial Literacy">Financial Literacy</option>
+                    <option value="E-Commerce & Online Business">E-Commerce & Online Business</option>
+                    <option value="Health & Wellness">Health & Wellness</option>
+                    <option value="Leadership & Empowerment">Leadership & Empowerment</option>
+                    <option value="Sustainability & Environment">Sustainability & Environment</option>
+                    <option value="Technology for Women Entrepreneurs">Technology for Women Entrepreneurs</option>
+                </select>
+                <button
+                    className={`btn ${editTopicId ? 'btn-success' : 'btn-primary'}`}
+                    onClick={editTopicId ? handleEditTopic : handleAddTopic}
+                >
+                    {editTopicId ? 'Save Changes' : 'Add Topic'}
+                </button>
             </div>
+            <h2>Your Mentorship Sessions</h2>
+            <ul>
+                {mentorshipSessions.map((session) => (
+                    <li key={session._id}>
+                        <strong>Session with: {session.menteeId.name}</strong>
+                        <div>Scheduled: {new Date(session.schedule).toLocaleString()}</div>
+                        <div>Status: {session.status}</div>
+                        {session.mentorFeedback && <div>Mentor Feedback: {session.mentorFeedback}</div>}
+                        {session.menteeFeedback && <div>Mentee Feedback: {session.menteeFeedback}</div>}
 
-            {/* Add New Session */}
-            <div>
-                <h3>Schedule New Session</h3>
-                <form onSubmit={handleSessionSubmit}>
-                    <input
-                        type="text"
-                        placeholder="Mentee ID"
-                        value={newSessionData.menteeId}
-                        onChange={(e) => setNewSessionData({ ...newSessionData, menteeId: e.target.value })}
-                    />
-                    <input
-                        type="datetime-local"
-                        value={newSessionData.schedule}
-                        onChange={(e) => setNewSessionData({ ...newSessionData, schedule: e.target.value })}
-                    />
-                    <textarea
-                        placeholder="Feedback (optional)"
-                        value={newSessionData.feedback}
-                        onChange={(e) => setNewSessionData({ ...newSessionData, feedback: e.target.value })}
-                    />
-                    <button type="submit">Schedule</button>
-                </form>
-            </div>
+                        {session.status === 'Pending' && (
+                            <button onClick={() => handleApproveSession(session._id)}>Approve</button>
+                        )}
+
+                        {session.status === 'Approved' && (
+                            <form onSubmit={handleCompleteSession}>
+                                <textarea
+                                    placeholder="Enter feedback"
+                                    value={feedbackData.sessionId === session._id ? feedbackData.feedback : ''}
+                                    onChange={(e) =>
+                                        setFeedbackData({ sessionId: session._id, feedback: e.target.value })
+                                    }
+                                ></textarea>
+                                <button type="submit">Mark as Completed</button>
+                            </form>
+                        )}
+
+                        {session.status !== 'Completed' && (
+                            <div>
+                                <input
+                                    type="datetime-local"
+                                    value={rescheduleData.sessionId === session._id ? rescheduleData.newSchedule : ''}
+                                    onChange={(e) =>
+                                        setRescheduleData({ sessionId: session._id, newSchedule: e.target.value })
+                                    }
+                                />
+                                <button onClick={() => handleRescheduleSession(session._id)}>Reschedule</button>
+                            </div>
+                        )}
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 };
 
 export default MentorDashboard;
+

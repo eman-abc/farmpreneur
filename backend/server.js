@@ -6,8 +6,9 @@ const connectDB = require('./db');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const authRoutes = require('./routes/authRoutes'); // Import the login routes
 const mentorshipRoutes = require('./routes/mentorshipRoutes');
-
 const mentorshipTopicRoutes = require('./routes/mentorshipTopicRoutes');
+
+
 // Connect to the database
 connectDB();
 
@@ -29,8 +30,9 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Register the login routes
-app.use('/api', authRoutes);  // Login route will now be available under /api/login
+// Register the auth routes
+app.use('/api/auth', authRoutes);
+
 
 // Register dashboard routes
 app.use('/api/dashboard', dashboardRoutes);
@@ -39,7 +41,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/mentorship', mentorshipRoutes);
 
 // Register the mentorship routes
-app.use('/api/mentor/mentorship-topics', mentorshipTopicRoutes);
+app.use('/api/topics', mentorshipTopicRoutes);
 
 //testing 
 // Test route to verify server is running

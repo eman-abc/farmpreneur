@@ -1,71 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import DashboardPage from './pages/DashboardPage';
+import React, { useState } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom'; // Use only the new import
+import LoginPage from './pages/LoginPage'; // Update import for LoginPage
+import DashboardPage from './pages/DashboardPage'; // Your Dashboard component
 
 const App = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [dashboardData, setDashboardData] = useState(null);
+    const [user, setUser] = useState(null); // Store logged-in user
 
-    useEffect(() => {
-        // Simulate login with email (no username)
-        fetch('http://localhost:5000/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email: 'sara@example.com', password: 'password123' }),
-            credentials: 'include', // Ensure session cookies are sent
-        })
-
-            .then((res) => {
-                if (res.ok) {
-                    setIsLoggedIn(true);
-                    alert('Logged in');
-                } else {
-                    alert('Invalid credentials');
-                }
-            })
-            .catch((err) => console.error(err));
-    }, []);
-
-    useEffect(() => {
-        if (isLoggedIn) {
-            fetch('http://localhost:5000/api/dashboard', {
-                method: 'GET',
-                credentials: 'include', // Ensure session cookie is included
-            })
-                .then((res) => {
-                    if (!res.ok) {
-                        throw new Error('Unauthorized');
-                    }
-                    return res.json();
-                })
-                .then((data) => {
-                    console.log('Fetched dashboard data:', data);  // Check the data here
-                    setDashboardData(data); // Store the data in state
-                })
-                
-                .catch((err) => {
-                    console.error('Error fetching dashboard data:', err);
-                });
-        }
-    }, [isLoggedIn]);
-
-
+    const handleLoginSuccess = (userData) => {
+        setUser(userData); // Update user state on successful login
+    };
 
     return (
-        <div>
-            {isLoggedIn ? (
-                dashboardData ? (
-                    <DashboardPage data={dashboardData} />
-                ) : (
-                    <div>Loading dashboard...</div>
-                )
-            ) : (
-                <div>Loading...</div> // Show loading screen until the user is logged in
-            )}
-        </div>
+        <Routes>
+            <Route
+                path="/login"
+                element={<LoginPage onLoginSuccess={handleLoginSuccess} />}
+            />
+
+            {/* Redirect to login if user is not authenticated */}
+            <Route
+                path="/dashboard"
+                element={user ? <DashboardPage /> : <Navigate to="/login" />}
+            />
+
+            {/* Default route to redirect to login if the user is not logged in */}
+            <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
+        </Routes>
     );
-    
 };
 
 export default App;

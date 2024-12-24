@@ -16,13 +16,20 @@ const mentorshipSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    topics: {
+      type: [String],
+      required: true, // Mandatory session topics
+    },
     status: {
       type: String,
       enum: ['Pending', 'Approved', 'Completed'],
       default: 'Pending',
     },
-    feedback: {
-      type: String,
+    mentorFeedback: {
+      type: String, // Mentor's feedback for the session
+    },
+    menteeFeedback: {
+      type: String, // Mentee's feedback for the session
     },
   },
   { timestamps: true }

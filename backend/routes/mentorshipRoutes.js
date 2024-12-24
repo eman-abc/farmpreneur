@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Mentorship = require('../models/Mentorship');
+const MentorshipTopic = require('../models/MentorshipTopic');
 const verifyMentor = require('../middleware/authMiddleware');
 const verifyMentee = require('../middleware/authMiddleware');
 
@@ -57,6 +58,58 @@ router.post('/mentor/sessions', verifyMentor, async (req, res) => {
     }
 });
 
+router.patch('/sessions/:id', async (req, res) => {
+    const { id } = req.params;
+    const { status, mentorFeedback } = req.body;
+
+    try {
+        const session = await Mentorship.findByIdAndUpdate(
+            id,
+            { status, mentorFeedback },
+            { new: true }
+        ).populate('mentorId menteeId');
+        res.status(200).json(session);
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating session' });
+    }
+});
+
+// Reschedule session by mentor
+router.patch('/sessions/:id/reschedule', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { newSchedule, reason } = req.body;
+
+        // Validate input
+        if (!newSchedule || !reason) {
+            return res.status(400).json({ error: 'New schedule and reason are required' });
+        }
+
+        // Find the session
+        const session = await MentorshipSession.findById(id);
+        if (!session) {
+            return res.status(404).json({ error: 'Session not found' });
+        }
+
+        // Update session schedule and log the reschedule
+        session.schedule = new Date(newSchedule);
+        session.rescheduleLog = session.rescheduleLog || [];
+        session.rescheduleLog.push({
+            by: 'Mentor',
+            reason,
+            timestamp: new Date(),
+        });
+
+        await session.save();
+
+        res.status(200).json({ message: 'Session rescheduled successfully', session });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Error rescheduling session' });
+    }
+});
+
+
 // Update mentorship session status (for example, to 'Completed' after the session)
 router.put('/mentor/sessions/:id', verifyMentor, async (req, res) => {
     const { status, feedback } = req.body;
@@ -69,6 +122,18 @@ router.put('/mentor/sessions/:id', verifyMentor, async (req, res) => {
         res.json(session);
     } catch (err) {
         res.status(500).send('Server error');
+    }
+});
+
+
+// Fetch mentorship topics by mentor ID
+router.get('/topics',verifyMentor, async (req, res) => {
+    const mentorId  = req.user._id;
+    try {
+        const topics = await MentorshipTopic.find({ mentor: mentorId });
+        res.json(topics);
+    } catch (err) {
+        res.status(500).json({ message: 'Error fetching mentorship topics' });
     }
 });
 
