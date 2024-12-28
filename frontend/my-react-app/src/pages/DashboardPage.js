@@ -1,66 +1,52 @@
 import React, { useEffect, useState } from 'react';
-import axios from '../api/axios'; // Import the custom axios instance
+import { useAuth } from '../AuthContext'; // Import the custom auth context hook
 import UserProfile from '../components/UserProfile'; // Adjust the path based on your file structure
 import EntrepreneurDashboard from '../components/EnterpreneurDashboard';
 import MentorDashboard from '../components/MentorDashboard';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 
 const DashboardPage = () => {
-    const [userData, setUserData] = useState(null); // State to store user data
-    const [loading, setLoading] = useState(true); // State to handle loading
+    const { user, loading } = useAuth(); // Access user and loading from AuthContext
     const [error, setError] = useState(null); // State to handle errors
     const navigate = useNavigate(); // Initialize useNavigate hook for redirection
 
-
     useEffect(() => {
-        const fetchDashboardData = async () => {
-            try {
-                // Use the custom axios instance to fetch data
-                const response = await axios.get('/dashboard'); // Just use the path part, baseURL is already set
-                setUserData(response.data.user); // Set user data from the response
-            } catch (err) {
-                setError(err.response?.data?.message || err.message); // Handle errors
-                // Check if the error message is unauthorized (401)
-                if (err.response?.status === 401) {
-                    // Redirect to the login page
-                    navigate('/login'); // You can replace '/login' with the correct path of your login page
-                }
-            } finally {
-                setLoading(false); // Stop loading after the request is done
-            }
-        };
+        if (!loading && !user) {
+            // Redirect to login if the user is not authenticated
+            navigate('/login');
+        }
+    }, [loading, user, navigate]);
 
-        fetchDashboardData();
-    },  [navigate]);
-    
+    // Show loading spinner/message if still loading
+    if (loading) return <div>Loading...</div>; 
 
-    if (loading) return <div>Loading...</div>; // Show loading spinner/message
-    if (error) return <div>Error: {error}</div>; // Display error messages
-    if (!userData) return <div>Error: Unable to load user data</div>; // Fallback in case of unexpected issues
+    // Show error message if any
+    if (error) return <div>Error: {error}</div>;
+
+    // Fallback in case of unexpected issues
+    if (!user) return <div>Error: Unable to load user data</div>;
 
     return (
         <div>
             <h1>Dashboard</h1>
-            <UserProfile user={userData} /> {/* Pass user data to the UserProfile component */}
+            <UserProfile user={user} /> {/* Pass user data to the UserProfile component */}
 
             {/* Entrepreneur Dashboard */}
-            {userData.role === 'Entrepreneur' && (
+            {user.role === 'Entrepreneur' && (
                 <div>
                     <EntrepreneurDashboard />
                 </div>
             )}
 
             {/* Mentor Dashboard */}
-            {userData.role === 'Mentor' && (
+            {user.role === 'Mentor' && (
                 <div>
-                    <div>
-                        <MentorDashboard />
-                    </div>
+                    <MentorDashboard />
                 </div>
             )}
 
             {/* NGO Dashboard */}
-            {userData.role === 'ngo' && (
+            {user.role === 'NGO' && (
                 <div>
                     <h2>Available Resources</h2>
                     <ul>

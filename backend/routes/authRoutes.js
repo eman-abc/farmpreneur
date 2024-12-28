@@ -6,48 +6,71 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 const authMiddleware = require('../middleware/authMiddleware');
 
-router.post('/login', async (req, res) => {
 
-    const { email, password } = req.body;
+router.get('/check-session', authMiddleware, (req, res) => {
+    console.log('Session Data:', req.session);  // Debugging session
+    return res.status(200).json({
+        message: 'User authenticated',
+        user: req.session.user,  // Send user data if session exists
+    });
+});
 
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Please provide both email and password.' });
+
+// Get current logged-in user's details
+router.get('/current', authMiddleware, (req, res) => {
+    // The user should be in session if logged in
+    if (req.session.user) {
+        return res.status(200).json({
+            message: 'User authenticated',
+            user: {
+                name: req.session.user.name,
+                email: req.session.user.email,
+                role: req.session.user.role,
+                location: req.session.user.location,
+                contactNumber: req.session.user.contactNumber,
+            }
+        });
+    } else {
+        return res.status(401).json({ message: 'Not authenticated' });
     }
+});
 
+
+router.post('/login', async (req, res) => {
     try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Please provide both email and password.' });
+        }
+
+        console.log(email, password);
         const user = await User.findOne({ email });
-        console.log("hitting thisss");
         if (!user) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            console.log('Invalid credentials no user');
+            return res.status(401).json({ message: 'Invalid credentials no user' });
         }
 
         const isMatch = await user.comparePassword(password);
-
         if (!isMatch) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+
+            console.log('Invalid credentials no match');
+            return res.status(401).json({ message: 'Invalid credentials no match' });
         }
 
-        req.session.user = user;
-        console.log('Session after login:', req.session);
-        console.log('Login route hit, user:', user);
-
+        req.session.user = { _id: user._id, name: user.name, email: user.email };
         res.status(200).json({
             message: 'Login successful',
-            user: {
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                location: user.location,
-                contactNumber: user.contactNumber,
-            },
+            user: { name: user.name, email: user.email, role: user.role, location: user.location, contactNumber: user.contactNumber },
         });
-        console.log('Session Data:', req.session.user);  // Check if session is set correctly
-
+        
+        console.log('Session Data:', req.session.user);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server errorrrrrrrrr' });
+        console.error('Caught Error:', error); // Ensure the error is logged
+        res.status(500).json({ message: 'Server error' });
     }
 });
+
 
 
 // Logout route

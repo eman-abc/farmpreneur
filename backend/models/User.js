@@ -48,6 +48,7 @@ const userSchema = new mongoose.Schema(
 // Add comparePassword method to the schema
 userSchema.methods.comparePassword = async function (password) {
   try {
+    console.log('Comparing:', password, 'with hash:', this.password);
     return await bcrypt.compare(password, this.password);  // Compare hashed password
   } catch (error) {
     throw new Error('Error comparing password');
@@ -68,5 +69,5 @@ userSchema.pre('save', async function (next) {
 });
 
 // Create the User model
-const User = mongoose.model('User', userSchema);
+
 module.exports = mongoose.model('User', userSchema);

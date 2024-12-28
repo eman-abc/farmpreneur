@@ -28,7 +28,7 @@ router.get('/', authMiddleware, (req, res) => {
 });
 
 // Entrepreneur Products Route
-router.get('/entrepreneur/products', productController.getEntrepreneurProducts);  // Ensure this route is defined
+// router.get('/entrepreneur/products', authMiddleware, productController.getEntrepreneurProducts);  // Ensure this route is defined
 
 
 module.exports = router;

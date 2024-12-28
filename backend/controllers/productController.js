@@ -3,6 +3,17 @@ const Product = require('../models/Product');
 // Add CRUD operations for products here
 
 // Create a new product
+const updateProductStock = async (productId, quantity) => {
+  const product = await Product.findById(productId);
+  if (!product) return;
+
+  product.stock -= quantity;
+  await product.save();
+};
+
+module.exports = { updateProductStock };
+
+
 exports.createProduct = async (req, res) => {
   try {
     const { title, description, price, ownerId, category, imageUrl } = req.body;

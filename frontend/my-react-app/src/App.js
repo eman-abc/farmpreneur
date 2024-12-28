@@ -1,31 +1,85 @@
-import React, { useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom'; // Use only the new import
-import LoginPage from './pages/LoginPage'; // Update import for LoginPage
-import DashboardPage from './pages/DashboardPage'; // Your Dashboard component
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './AuthContext'; // Auth Context
+import MarketplacePage from './pages/MarketplacePage';
+import ProductDetailsPage from './pages/ProductDetails';
+import CartPage from './pages/CartPage';
+import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
+import CheckoutPage from './pages/CheckoutPage';
+import OrderConfirmationPage from './pages/OrderConfirmationPage';
 
-const App = () => {
-    const [user, setUser] = useState(null); // Store logged-in user
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+    const { user, loading } = useAuth();
 
-    const handleLoginSuccess = (userData) => {
-        setUser(userData); // Update user state on successful login
-    };
+    if (loading) return <div>Loading...</div>; // Or a loading spinner
+
+    return user ? children : <Navigate to="/login" />;
+};
+
+// Separate Routes Component
+const AppRoutes = () => {
+    const { user } = useAuth(); // Extract the user state from AuthContext
 
     return (
         <Routes>
+            <Route path="/marketplace" element={<MarketplacePage />} />
+            <Route path="/products/:id" element={<ProductDetailsPage />} />
+
+            {/* Protect the cart route */}
             <Route
-                path="/login"
-                element={<LoginPage onLoginSuccess={handleLoginSuccess} />}
+                path="/cart"
+                element={
+                    <ProtectedRoute>
+                        <CartPage />
+                    </ProtectedRoute>
+                }
             />
 
-            {/* Redirect to login if user is not authenticated */}
+            {/* Login page is public */}
+            <Route path="/login" element={<LoginPage />} />
+
+            {/* Protect the dashboard route */}
             <Route
                 path="/dashboard"
-                element={user ? <DashboardPage /> : <Navigate to="/login" />}
+                element={
+                    <ProtectedRoute>
+                        <DashboardPage />
+                    </ProtectedRoute>
+                }
+            />
+            {/* {checkout route} */}
+            <Route
+                path="/checkout"
+                element={
+                    <ProtectedRoute>
+                        <CheckoutPage />
+                    </ProtectedRoute>
+                }
             />
 
-            {/* Default route to redirect to login if the user is not logged in */}
-            <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
+            {/* Other routes */}
+            <Route
+                path="/order-confirmation"
+                element={
+                    <ProtectedRoute>
+                        <OrderConfirmationPage />
+                    </ProtectedRoute>
+                }
+            />
+
+            {/* Default route */}
+            <Route path="*" element={<Navigate to={user ? "/dashboard" : "/marketplace"} />} />
         </Routes>
+    );
+};
+
+const App = () => {
+    return (
+        <AuthProvider> {/* Wrap the app in the AuthProvider */}
+            <AppRoutes />
+        </AuthProvider>
     );
 };
 

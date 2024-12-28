@@ -7,7 +7,10 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const authRoutes = require('./routes/authRoutes'); // Import the login routes
 const mentorshipRoutes = require('./routes/mentorshipRoutes');
 const mentorshipTopicRoutes = require('./routes/mentorshipTopicRoutes');
-
+const marketplaceRoutes = require('./routes/marketplaceRoutes');
+const ProductDetailsRoutes = require('./routes/productDetailsRoutes');
+const cartRoutes = require('./routes/cartRoutes');
+const checkoutRoutes = require('./routes/checkoutRoutes');
 
 // Connect to the database
 connectDB();
@@ -30,8 +33,15 @@ app.use(cors({
 }));
 app.use(express.json());
 
+
+
 // Register the auth routes
 app.use('/api/auth', authRoutes);
+
+
+
+app.use('/api', marketplaceRoutes);
+
 
 
 // Register dashboard routes
@@ -43,6 +53,14 @@ app.use('/api/mentorship', mentorshipRoutes);
 // Register the mentorship routes
 app.use('/api/topics', mentorshipTopicRoutes);
 
+// register the checkout routes
+app.use('/api/checkout', checkoutRoutes);
+
+// register cart routes
+app.use('/api/cart', cartRoutes);
+
+//checkout routes
+app.use('/api/checkout', checkoutRoutes);
 //testing 
 // Test route to verify server is running
 app.get('/', (req, res) => {
