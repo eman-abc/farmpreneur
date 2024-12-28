@@ -29,16 +29,40 @@ const MarketplacePage = () => {
         fetchProducts();
     }, [filters, page]);
 
-    const handleAddToCart = (product) => {
+    const handleAddToCart = async (product) => {
         if (!user) {
             // If the user is not logged in, save the current page location and redirect to login
-            navigate('/login', { state: { from: '/cart' } });
-        } else {
-            // If the user is logged in, add the product to the cart
-            setCart((prevCart) => [...prevCart, product]);
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+
+        console.log("User from context:", user); // Ensure user is being fetched from context
+
+        if (!product || !product._id) {
+            console.error("Product ID is missing or undefined.");
+            return;
+        }
+
+        try {
+            // Send the product and quantity to the backend to add to the cart
+            const response = await axiosInstance.post(
+                'cart/add',
+                { product, quantity: 1 }, // Adjust quantity as per your requirement
+                {
+                    withCredentials: true,  // Include cookies with the request
+                    headers: {
+                        'Content-Type': 'application/json',  // Ensure it's sent as JSON
+                    },
+                }
+            );
+
+            console.log('Added to cart:', response.data);
             alert(`${product.title} has been added to your cart!`);
+        } catch (error) {
+            console.error('Error adding to cart:', error.response?.data || error.message);
         }
     };
+
 
     // Handle Card Click (Navigate to Product Details)
     const handleCardClick = (productId) => {

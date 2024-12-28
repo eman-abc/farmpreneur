@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../api/axios';
 import { useAuth } from '../AuthContext'; // Import useAuth to access user context
+import ReviewList from '../components/ReviewList';
+import CreateReview from '../components/CreateReview';
 
 const ProductDetailsPage = () => {
     const { id } = useParams();
@@ -48,7 +50,7 @@ const ProductDetailsPage = () => {
                     },
                 }
             );
-            
+
             console.log('Added to cart:', response.data);
         } catch (error) {
             console.error('Error adding to cart:', error.response?.data || error.message);
@@ -135,6 +137,13 @@ const ProductDetailsPage = () => {
                     </div>
                 </div>
             </div>
+            {/* Reviews Section */}
+            <div className="mt-4">
+                <h3>Reviews</h3>
+                <ReviewList productId={id} />
+                {user && <CreateReview productId={id} user={user} />}
+            </div>
+
         </div>
     );
 };

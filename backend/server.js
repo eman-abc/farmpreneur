@@ -11,6 +11,9 @@ const marketplaceRoutes = require('./routes/marketplaceRoutes');
 const ProductDetailsRoutes = require('./routes/productDetailsRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const checkoutRoutes = require('./routes/checkoutRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+
+
 
 // Connect to the database
 connectDB();
@@ -38,7 +41,7 @@ app.use(express.json());
 // Register the auth routes
 app.use('/api/auth', authRoutes);
 
-
+app.use('/api/reviews', reviewRoutes);
 
 app.use('/api', marketplaceRoutes);
 

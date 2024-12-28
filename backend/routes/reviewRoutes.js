@@ -1,14 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const reviewController = require('../controllers/reviewController');
+const authMiddleware = require('../middleware/authMiddleware');
 
 // Add routes for review CRUD operations here
 
 // Review Routes
-router.post('/reviews', reviewController.createReview);
-router.get('/reviews', reviewController.getAllReviews);
-router.get('/reviews/product/:productId', reviewController.getReviewsByProduct);
-router.put('/reviews/:id', reviewController.updateReview);
-router.delete('/reviews/:id', reviewController.deleteReview);
+router.post('/', authMiddleware,reviewController.createReview); // Create a review
+router.get('/product/:productId', reviewController.getReviewsByProduct); // Get reviews by product ID
+router.delete('/:reviewId', authMiddleware, reviewController.deleteReview);
 
 module.exports = router;
