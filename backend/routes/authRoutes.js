@@ -58,12 +58,17 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ message: 'Invalid credentials no match' });
         }
 
-        req.session.user = { _id: user._id, name: user.name, email: user.email };
+        req.session.user = {
+            _id: user._id, name: user.name, email: user.email, role: user.role, // Add role here
+            location: user.location, // Add location here
+            contactNumber: user.contactNumber, // Add contactNumber here
+            createdAt: user.createdAt, 
+        };
         res.status(200).json({
             message: 'Login successful',
-            user: { name: user.name, email: user.email, role: user.role, location: user.location, contactNumber: user.contactNumber },
+            user: { name: user.name, email: user.email, role: user.role, location: user.location, contactNumber: user.contactNumber ,createdAt: user.createdAt},
         });
-        
+
         console.log('Session Data:', req.session.user);
     } catch (error) {
         console.error('Caught Error:', error); // Ensure the error is logged

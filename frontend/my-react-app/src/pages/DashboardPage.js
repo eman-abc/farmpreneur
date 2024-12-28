@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../AuthContext'; // Import the custom auth context hook
 import UserProfile from '../components/UserProfile'; // Adjust the path based on your file structure
-import EntrepreneurDashboard from '../components/EnterpreneurDashboard';
+import EntrepreneurDashboard from '../components/EntrepreneurDashboard';
 import MentorDashboard from '../components/MentorDashboard';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 
@@ -9,7 +9,7 @@ const DashboardPage = () => {
     const { user, loading } = useAuth(); // Access user and loading from AuthContext
     const [error, setError] = useState(null); // State to handle errors
     const navigate = useNavigate(); // Initialize useNavigate hook for redirection
-
+    console.log(user.role);
     useEffect(() => {
         if (!loading && !user) {
             // Redirect to login if the user is not authenticated
@@ -18,7 +18,7 @@ const DashboardPage = () => {
     }, [loading, user, navigate]);
 
     // Show loading spinner/message if still loading
-    if (loading) return <div>Loading...</div>; 
+    if (loading) return <div>Loading...</div>;
 
     // Show error message if any
     if (error) return <div>Error: {error}</div>;

@@ -12,6 +12,8 @@ const ProductDetailsRoutes = require('./routes/productDetailsRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const checkoutRoutes = require('./routes/checkoutRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const entrepreneurSessionRoutes =require('./routes/entreSessionRoutes');
+
 
 
 
@@ -45,6 +47,7 @@ app.use('/api/reviews', reviewRoutes);
 
 app.use('/api', marketplaceRoutes);
 
+app.use('/api/entrepreneur', entrepreneurSessionRoutes);
 
 
 // Register dashboard routes

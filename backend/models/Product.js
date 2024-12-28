@@ -8,7 +8,7 @@ const productSchema = new mongoose.Schema(
         ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
         category: { type: String, enum: ['Handicrafts', 'Organic Produce'], required: true },
         imageUrl: [{ type: String }],
-        status: { type: String, enum: ['Available', 'Sold'], default: 'Available' },
+        status: { type: String, enum: ['Available', 'Sold', 'Out of Stock'], default: 'Available' },
         ratings: { type: [Number], default: [] },
         stock: { type: Number, default: 1 },
         soldCount: { type: Number, default: 0 },

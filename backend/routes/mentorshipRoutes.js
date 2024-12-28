@@ -40,7 +40,7 @@ router.get('/mentee/sessions', verifyMentee, async (req, res) => {
     }
 });
 
-// Schedule a new mentorship session
+// Schedule a new mentorship session by mentor
 router.post('/mentor/sessions', verifyMentor, async (req, res) => {
     const { menteeId, schedule, feedback } = req.body;
     try {
@@ -49,6 +49,24 @@ router.post('/mentor/sessions', verifyMentor, async (req, res) => {
             menteeId,
             schedule,
             feedback,
+            status: 'Pending'
+        });
+        await newSession.save();
+        res.json(newSession);
+    } catch (err) {
+        res.status(500).send('Server error');
+    }
+});
+
+// Schedule a new mentorship session by mentee
+router.post('/mentee/sessions', verifyMentee, async (req, res) => {
+    const { mentorId, schedule, topics } = req.body;
+    try {
+        const newSession = new Mentorship({
+            menteeId: req.user._id,
+            mentorId,
+            schedule,
+            topics,
             status: 'Pending'
         });
         await newSession.save();
@@ -127,8 +145,8 @@ router.put('/mentor/sessions/:id', verifyMentor, async (req, res) => {
 
 
 // Fetch mentorship topics by mentor ID
-router.get('/topics',verifyMentor, async (req, res) => {
-    const mentorId  = req.user._id;
+router.get('/topics', verifyMentor, async (req, res) => {
+    const mentorId = req.user._id;
     try {
         const topics = await MentorshipTopic.find({ mentor: mentorId });
         res.json(topics);

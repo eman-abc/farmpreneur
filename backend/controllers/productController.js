@@ -76,15 +76,23 @@ exports.deleteProduct = async (req, res) => {
 
 
 
+// controllers/productController.js
 exports.getEntrepreneurProducts = async (req, res) => {
+  console.log('controller entered');
   try {
+    // Ensure the user is authenticated and has the 'Entrepreneur' role
+    if (!req.session.user || req.session.user.role !== 'Entrepreneur') {
+      return res.status(403).json({ message: 'Access denied. Entrepreneur role required.' });
+    }
+
     // Fetch products for the logged-in entrepreneur based on their userId (ownerId)
     const products = await Product.find({ ownerId: req.session.user._id });
 
-    if (!products) {
+    if (!products || products.length === 0) {
       return res.status(404).json({ message: 'No products found for this entrepreneur.' });
     }
 
+    console.log(products);
     res.status(200).json({ products });
   } catch (error) {
     console.error(error);
