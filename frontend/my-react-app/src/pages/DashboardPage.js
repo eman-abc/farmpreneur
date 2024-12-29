@@ -5,6 +5,8 @@ import EntrepreneurDashboard from '../components/EntrepreneurDashboard';
 import MentorDashboard from '../components/MentorDashboard';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 import NGODashboard from '../components/NGODashboard';
+import ResourceList from '../components/ResourceList';
+
 
 const DashboardPage = () => {
     const { user, loading } = useAuth(); // Access user and loading from AuthContext

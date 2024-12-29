@@ -6,26 +6,22 @@ const ExternalResource = require('../models/ExternalResource');
 // create res for ngos
 router.post('/', authMiddleware, async (req, res) => {
     console.log("inside res create middleware");
-    const { title, type, url, category } = req.body;
+    const { title, url, category, description } = req.body;
     console.log(req.body);  // Log the request body for debugging
 
-    if (!title || !type || !url || !category) {
+    if (!title || !url || !category) {
         return res.status(400).json({ message: 'Missing required fields' });
     }
 
     try {
         const newResource = new ExternalResource({
             title,
-            type,
             url,
             category,
+            description,
             createdBy: req.user._id,  // Changed 'createdBy' to 'uploaderId'
         });
 
-        const validationError = newResource.validateSync();
-        if (validationError) {
-            return res.status(400).json({ error: 'Validation failed', details: validationError });
-        }
 
         const savedResource = await newResource.save();
         res.status(201).json(savedResource);
@@ -37,8 +33,10 @@ router.post('/', authMiddleware, async (req, res) => {
 
 //get resource for entrepreneurs
 router.get('/', async (req, res) => {
+    console.log('inside get resources for entreprenuer');
     try {
         const resources = await ExternalResource.find().populate('createdBy', 'name email');
+        console.log(resources);
         res.json(resources);
     } catch (err) {
         res.status(500).json({ error: 'Server error', details: err.message });
@@ -48,6 +46,7 @@ router.get('/', async (req, res) => {
 
 // update res for ngos
 router.put('/:id', authMiddleware, async (req, res) => {
+
     const { title, description, url, category } = req.body;
 
     try {

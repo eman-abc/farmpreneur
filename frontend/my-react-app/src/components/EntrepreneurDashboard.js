@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../api/axios'; // Import the Axios instance
+import ResourceList from './ResourceList';
+import AidList from './AidList';
 
 const EntrepreneurDashboard = () => {
     const [products, setProducts] = useState([]);
@@ -228,7 +230,11 @@ const EntrepreneurDashboard = () => {
                 </table>
             </div>
 
+            {/* Resources Section */}
+            <ResourceList /> {/* Add ResourceList component here */}
             {/* Sessions Section */}
+            {/* Financial Aid Programs Section */}
+            <AidList /> {/* Add FinancialAidPrograms component here */}
             <div>
                 <h3>Your Sessions</h3>
 

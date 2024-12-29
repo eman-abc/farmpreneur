@@ -32,16 +32,28 @@ router.post('/', authMiddleware, async (req, res) => {
 
 // Get all financial aid programs
 router.get('/', async (req, res) => {
-    console.log('entered aid get route backend');
+    console.log('Entered aid get route backend');
     try {
-        const programs = await FinancialAid.find().populate('createdBy', 'name email');
-        console.log("Populated programs");
+        const programs = await FinancialAid.find()
+            .populate('createdBy', 'name email')
+            .exec();  // Execute the query and return a promise
+
+        console.log("Populated programssss:");
         console.log(programs);
+
+        if (programs.length === 0) {
+            console.log("No programs found or no NGOs associated.");
+        } else {
+            console.log("Found programs with populated data.");
+        }
+
         res.json(programs);
     } catch (err) {
+        console.error("Error fetching financial aids:", err);
         res.status(500).send('Server error');
     }
 });
+
 
 // Update a financial aid program by ID
 router.put('/:id', authMiddleware, async (req, res) => {

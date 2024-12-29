@@ -8,9 +8,9 @@ const NGODashboard = () => {
     const [aidPrograms, setAidPrograms] = useState([]);
     const [newResource, setNewResource] = useState({
         title: '',
-        type: '',
         url: '',
         category: '',
+        description: '',
     });
     const [newAid, setNewAid] = useState({
         title: '',
@@ -19,6 +19,8 @@ const NGODashboard = () => {
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [editingResource, setEditingResource] = useState(null);
+    const [editingAid, setEditingAid] = useState(null);
 
     // Fetch resources and aid programs data
     useEffect(() => {
@@ -26,8 +28,8 @@ const NGODashboard = () => {
             try {
                 setLoading(true);
                 const [resourceResponse, aidResponse] = await Promise.all([
-                    axios.get('/resource'), // Make sure to use the correct API endpoint
-                    axios.get('/aid/my') // Make sure to use the correct API endpoint
+                    axios.get('/resource/my'),
+                    axios.get('/aid/my')
                 ]);
                 setResources(resourceResponse.data);
                 setAidPrograms(aidResponse.data);
@@ -40,16 +42,30 @@ const NGODashboard = () => {
         };
 
         fetchDashboardData();
-    }, []); // Empty dependency array means it runs once on mount
+    }, []);
 
     // Add a new resource
     const handleAddResource = async () => {
         try {
             const response = await axios.post('/resource', newResource);
             setResources([...resources, response.data]);
-            setNewResource({ title: '', type: '', url: '', category: '' });
+            setNewResource({ title: '', url: '', category: '', description: '' });
         } catch (err) {
             console.error('Failed to add resource:', err);
+        }
+    };
+
+    // Update resource
+    const handleUpdateResource = async () => {
+        try {
+            const response = await axios.put(`/resource/${editingResource._id}`, newResource);
+            setResources(resources.map((resource) =>
+                resource._id === editingResource._id ? response.data : resource
+            ));
+            setNewResource({ title: '', url: '', category: '', description: '' });
+            setEditingResource(null);
+        } catch (err) {
+            console.error('Failed to update resource:', err);
         }
     };
 
@@ -74,19 +90,29 @@ const NGODashboard = () => {
         }
     };
 
-
+    // Update aid program
+    const handleUpdateAidProgram = async () => {
+        try {
+            const response = await axios.put(`/aid/${editingAid._id}`, newAid);
+            setAidPrograms(aidPrograms.map((aid) =>
+                aid._id === editingAid._id ? response.data : aid
+            ));
+            setNewAid({ title: '', description: '', amount: '' });
+            setEditingAid(null);
+        } catch (err) {
+            console.error('Failed to update aid program:', err);
+        }
+    };
 
     // Delete aid program
     const handleDeleteAidProgram = async (id) => {
         try {
-            console.log("Deleting aid program with ID:", id);  // Debugging line
             await axios.delete(`/aid/${id}`);
-            setAidPrograms(aidPrograms.filter((aid) => aid._id !== id)); // Use _id instead of id
+            setAidPrograms(aidPrograms.filter((aid) => aid._id !== id));
         } catch (err) {
             console.error('Failed to delete aid program:', err);
         }
     };
-
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>{error}</div>;
@@ -95,15 +121,17 @@ const NGODashboard = () => {
         <div className="ngo-dashboard">
             <h1>NGO Dashboard</h1>
 
-
-
             {/* Resource Management */}
             <section>
                 <h2>Manage Resources</h2>
                 <form
                     onSubmit={(e) => {
                         e.preventDefault();
-                        handleAddResource();
+                        if (editingResource) {
+                            handleUpdateResource();
+                        } else {
+                            handleAddResource();
+                        }
                     }}
                 >
                     <input
@@ -119,9 +147,13 @@ const NGODashboard = () => {
                         onChange={(e) => setNewResource({ ...newResource, url: e.target.value })}
                         required
                     ></textarea>
-
-                    {/* Resource Type Dropdown */}
-                    <select
+                    <textarea
+                        placeholder="Resource Description"
+                        value={newResource.description}
+                        onChange={(e) => setNewResource({ ...newResource, description: e.target.value })}
+                        required
+                    ></textarea>
+                    {/* <select
                         value={newResource.type}
                         onChange={(e) => setNewResource({ ...newResource, type: e.target.value })}
                         required
@@ -130,9 +162,7 @@ const NGODashboard = () => {
                         <option value="PDF">PDF</option>
                         <option value="Video">Video</option>
                         <option value="Link">Link</option>
-                    </select>
-
-                    {/* Resource Category Dropdown */}
+                    </select> */}
                     <select
                         value={newResource.category}
                         onChange={(e) => setNewResource({ ...newResource, category: e.target.value })}
@@ -143,17 +173,27 @@ const NGODashboard = () => {
                         <option value="Finance">Finance</option>
                         <option value="Product Development">Product Development</option>
                     </select>
-
-                    <button type="submit">Add Resource</button>
+                    <button type="submit">{editingResource ? 'Update Resource' : 'Add Resource'}</button>
                 </form>
 
                 <ul>
                     {resources.map((resource) => (
                         <li key={resource._id}>
                             <h3>{resource.title}</h3>
-                            <p>Type: {resource.type}</p>
+                            {/* <p>Type: {resource.type}</p> Corrected line */}
+                            <p>Description: {resource.description}</p>
                             <p>Category: {resource.category}</p>
                             <p>URL: <a href={resource.url} target="_blank" rel="noopener noreferrer">{resource.url}</a></p>
+                            <button onClick={() => {
+                                setEditingResource(resource);
+                                setNewResource({
+                                    title: resource.title,
+                                    url: resource.url,
+                                    description: resource.description,
+                                    type: resource.type,
+                                    category: resource.category
+                                });
+                            }}>Edit</button>
                             <button onClick={() => handleDeleteResource(resource._id)}>Delete</button>
                         </li>
                     ))}
@@ -166,7 +206,11 @@ const NGODashboard = () => {
                 <form
                     onSubmit={(e) => {
                         e.preventDefault();
-                        handleAddAidProgram();
+                        if (editingAid) {
+                            handleUpdateAidProgram();
+                        } else {
+                            handleAddAidProgram();
+                        }
                     }}
                 >
                     <input
@@ -189,16 +233,24 @@ const NGODashboard = () => {
                         onChange={(e) => setNewAid({ ...newAid, amount: e.target.value })}
                         required
                     />
-                    <button type="submit">Add Aid Program</button>
+                    <button type="submit">{editingAid ? 'Update Aid Program' : 'Add Aid Program'}</button>
                 </form>
 
                 <ul>
                     {aidPrograms.map((aid) => (
-                        <li key={aid._id}> {/* Use _id as key */}
+                        <li key={aid._id}>
                             <h3>{aid.title}</h3>
                             <p>{aid.description}</p>
                             <p>Amount: {aid.amount}</p>
-                            <button onClick={() => handleDeleteAidProgram(aid._id)}>Delete</button> {/* Pass _id here */}
+                            <button onClick={() => {
+                                setEditingAid(aid);
+                                setNewAid({
+                                    title: aid.title,
+                                    description: aid.description,
+                                    amount: aid.amount
+                                });
+                            }}>Edit</button>
+                            <button onClick={() => handleDeleteAidProgram(aid._id)}>Delete</button>
                         </li>
                     ))}
                 </ul>
