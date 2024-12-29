@@ -12,10 +12,9 @@ const ProductDetailsRoutes = require('./routes/productDetailsRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const checkoutRoutes = require('./routes/checkoutRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
-const entrepreneurSessionRoutes =require('./routes/entreSessionRoutes');
-
-
-
+const entrepreneurSessionRoutes = require('./routes/entreSessionRoutes');
+const aidRoutes = require('./routes/aidRoutes');
+const resourceRoutes = require('./routes/resourceRoutes');
 
 // Connect to the database
 connectDB();
@@ -49,9 +48,15 @@ app.use('/api', marketplaceRoutes);
 
 app.use('/api/entrepreneur', entrepreneurSessionRoutes);
 
+//aid routes
+app.use('/api/aid', aidRoutes);
 
 // Register dashboard routes
 app.use('/api/dashboard', dashboardRoutes);
+
+// register resource routes
+app.use('/api/resource', resourceRoutes);
+
 
 // Register the mentorship routes
 app.use('/api/mentorship', mentorshipRoutes);

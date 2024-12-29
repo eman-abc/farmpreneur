@@ -4,6 +4,7 @@ import UserProfile from '../components/UserProfile'; // Adjust the path based on
 import EntrepreneurDashboard from '../components/EntrepreneurDashboard';
 import MentorDashboard from '../components/MentorDashboard';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
+import NGODashboard from '../components/NGODashboard';
 
 const DashboardPage = () => {
     const { user, loading } = useAuth(); // Access user and loading from AuthContext
@@ -48,11 +49,7 @@ const DashboardPage = () => {
             {/* NGO Dashboard */}
             {user.role === 'NGO' && (
                 <div>
-                    <h2>Available Resources</h2>
-                    <ul>
-                        {/* Example: Replace with real data */}
-                        <li>Resource A</li>
-                    </ul>
+                    <NGODashboard />
                 </div>
             )}
         </div>

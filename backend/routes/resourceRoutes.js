@@ -1,14 +1,104 @@
 const express = require('express');
 const router = express.Router();
-const resourceController = require('../controllers/resourceController');
+const authMiddleware = require('../middleware/authMiddleware');
+const ExternalResource = require('../models/ExternalResource');
 
-// Add routes for resource CRUD operations here
+// create res for ngos
+router.post('/', authMiddleware, async (req, res) => {
+    console.log("inside res create middleware");
+    const { title, type, url, category } = req.body;
+    console.log(req.body);  // Log the request body for debugging
 
-// Resource Routes
-router.post('/resources', resourceController.createResource);
-router.get('/resources', resourceController.getAllResources);
-router.get('/resources/:id', resourceController.getResourceById);
-router.put('/resources/:id', resourceController.updateResource);
-router.delete('/resources/:id', resourceController.deleteResource);
+    if (!title || !type || !url || !category) {
+        return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    try {
+        const newResource = new ExternalResource({
+            title,
+            type,
+            url,
+            category,
+            createdBy: req.user._id,  // Changed 'createdBy' to 'uploaderId'
+        });
+
+        const validationError = newResource.validateSync();
+        if (validationError) {
+            return res.status(400).json({ error: 'Validation failed', details: validationError });
+        }
+
+        const savedResource = await newResource.save();
+        res.status(201).json(savedResource);
+    } catch (err) {
+        console.error('Error details:', err);
+        res.status(500).json({ error: 'Server error', details: err.message });
+    }
+});
+
+//get resource for entrepreneurs
+router.get('/', async (req, res) => {
+    try {
+        const resources = await ExternalResource.find().populate('createdBy', 'name email');
+        res.json(resources);
+    } catch (err) {
+        res.status(500).json({ error: 'Server error', details: err.message });
+    }
+});
+
+
+// update res for ngos
+router.put('/:id', authMiddleware, async (req, res) => {
+    const { title, description, url, category } = req.body;
+
+    try {
+        const updatedResource = await ExternalResource.findByIdAndUpdate(
+            req.params.id,
+            { title, description, url, category },
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedResource) {
+            return res.status(404).json({ message: 'Resource not found' });
+        }
+
+        res.json(updatedResource);
+    } catch (err) {
+        res.status(500).json({ error: 'Server error', details: err.message });
+    }
+});
+
+
+//delete res for ngos
+router.delete('/:id', authMiddleware, async (req, res) => {
+    console.log("inside delete resource middleware")
+    try {
+        const deletedResource = await ExternalResource.findByIdAndDelete(req.params.id);
+
+        if (!deletedResource) {
+            return res.status(404).json({ message: 'Resource not found' });
+        }
+
+        res.json({ message: 'Resource deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ error: 'Server error', details: err.message });
+    }
+});
+
+// get ngo resources
+router.get('/my', authMiddleware, async (req, res) => {
+    try {
+        // Filter resources by the current NGO's ID
+        const resources = await ExternalResource.find({ createdBy: req.user._id });
+
+        if (!resources || resources.length === 0) {
+            return res.status(404).json({ message: 'No resources found for this NGO.' });
+        }
+
+        res.json(resources);
+    } catch (err) {
+        res.status(500).json({ error: 'Server error', details: err.message });
+    }
+});
+
 
 module.exports = router;
