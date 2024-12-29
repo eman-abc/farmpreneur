@@ -95,7 +95,40 @@ router.delete('/entrepreneur/products/:id', authMiddleware, async (req, res) => 
     }
 });
 
+// Add a new product (Entrepreneur)
+router.post('/entrepreneur/products', authMiddleware, async (req, res) => {
+    console.log('inside add new product route');
 
+    // Extract product data from the request body
+    console.log(req.body);
+    // Check if all required fields are provided
+    const { title, price, status, category, stock, description } = req.body;
+
+    if (!title || !price || !status || !category || !stock || !description) {
+        return res.status(400).json({ message: 'All fields are required.' });
+    }
+    try {
+        // Create a new product object with the provided data
+        const newProduct = new Product({
+            title,
+            price,
+            status: status || 'Available',  // Provide default if empty
+            category: category || 'Handicrafts',  // Provide default if empty
+            stock,
+            description,
+            ownerId: req.session.user._id  // Associate the product with the logged-in entrepreneur
+        });
+
+        // Save the new product to the database
+        await newProduct.save();
+
+        // Return the newly created product in the response
+        res.status(201).json({ message: 'Product added successfully', product: newProduct });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error adding new product.' });
+    }
+});
 
 
 module.exports = router;
