@@ -1,24 +1,26 @@
 import React, { useState } from 'react';
 import axios from '../api/axios';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
-const CreateReview = ({ productId, user }) => {
+const CreateReview = ({ productId, user, onReviewAdded }) => {
     const [newReview, setNewReview] = useState({ rating: 1, comment: '' });
-    const navigate = useNavigate(); // Initialize useNavigate
+    const navigate = useNavigate();
 
-    
     const handleAddReview = async () => {
         try {
-            console.log('submit review button pressed')
             const response = await axios.post('/reviews', {
                 productId,
                 userId: user.id,
                 ...newReview,
             });
-            console.log('Review added successfully:', response.data);
+
+            // Add the new review to the list in parent component
+            if (onReviewAdded) {
+                onReviewAdded(response.data);
+            }
+
             setNewReview({ rating: 1, comment: '' });
-            // Redirect to the product details page
-            navigate(`/product/${productId}`); // Assuming you have a route for product details
+            navigate(`/products/${productId}`);
         } catch (error) {
             console.error('Error adding review:', error.response?.data || error.message);
         }

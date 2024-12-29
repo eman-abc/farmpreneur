@@ -8,10 +8,12 @@ import CreateReview from '../components/CreateReview';
 const ProductDetailsPage = () => {
     const { id } = useParams();
     const [product, setProduct] = useState(null);
-    const [quantity, setQuantity] = useState(1);  // Quantity state
+    const [quantity, setQuantity] = useState(1); // Quantity state
     const navigate = useNavigate();
-    const { user } = useAuth();  // Get the user from AuthContext
+    const { user } = useAuth(); // Get the user from AuthContext
+    const [reviews, setReviews] = useState([]); // State to store reviews
 
+    // Fetch Product Details
     useEffect(() => {
         const fetchProductDetails = async () => {
             try {
@@ -19,12 +21,19 @@ const ProductDetailsPage = () => {
                 setProduct(response.data);
             } catch (err) {
                 console.error('Error fetching product details', err);
+                alert('Failed to load product details. Please try again later.');
             }
         };
 
         fetchProductDetails();
     }, [id]);
 
+
+    const handleReviewAdded = (newReview) => {
+        setReviews((prevReviews) => [...prevReviews, newReview]); // Add new review to the list
+    };
+
+    // Handle Add to Cart
     const handleAddToCart = async () => {
         if (!user) {
             navigate('/login', { state: { from: window.location.pathname } });
@@ -32,7 +41,6 @@ const ProductDetailsPage = () => {
         }
 
         console.log("User from context:", user);
-
 
         if (!product || !product._id) {
             console.error("Product ID is missing or undefined.");
@@ -42,23 +50,24 @@ const ProductDetailsPage = () => {
         try {
             const response = await axios.post(
                 'cart/add',
-                { product, quantity },
+                { productId: product._id, quantity },
                 {
-                    withCredentials: true,  // Include cookies with the request
+                    withCredentials: true,
                     headers: {
-                        'Content-Type': 'application/json',  // Ensure it's sent as JSON
+                        'Content-Type': 'application/json',
                     },
                 }
             );
 
             console.log('Added to cart:', response.data);
+            alert(`${product.title} has been added to your cart!`);
         } catch (error) {
             console.error('Error adding to cart:', error.response?.data || error.message);
+            alert('Failed to add to cart. Please try again.');
         }
     };
 
-
-
+    // Handle Buy Now
     const handleBuyNow = () => {
         if (!user) {
             navigate('/login', { state: { from: window.location.pathname } });
@@ -68,18 +77,20 @@ const ProductDetailsPage = () => {
         navigate('/checkout', { state: { productId: product._id, quantity } });
     };
 
+    // Handle Quantity Change
     const handleQuantityChange = (e) => {
-        let newQuantity = Math.max(1, e.target.value);  // Prevent quantity from going below 1
-        newQuantity = Math.min(newQuantity, product.stock);  // Prevent quantity from exceeding stock
-        setQuantity(newQuantity);
+        const inputQuantity = parseInt(e.target.value, 10) || 1; // Default to 1 if NaN
+        setQuantity(Math.max(1, Math.min(inputQuantity, product.stock))); // Clamp value between 1 and stock
     };
 
+    // Increase Quantity
     const increaseQuantity = () => {
         if (quantity < product.stock) {
             setQuantity(quantity + 1);
         }
     };
 
+    // Decrease Quantity
     const decreaseQuantity = () => {
         if (quantity > 1) {
             setQuantity(quantity - 1);
@@ -103,7 +114,10 @@ const ProductDetailsPage = () => {
                     <p>{product.description}</p>
                     <p><strong>Price:</strong> ${product.price}</p>
                     <p><strong>Category:</strong> {product.category}</p>
-                    <p><strong>Seller:</strong> {product.ownerId.name}</p>
+                    <p>
+                        <strong>Seller:</strong>{' '}
+                        {product.ownerId ? product.ownerId.name : 'Unknown Seller'}
+                    </p>
                     <p>
                         <strong>Stock:</strong>{' '}
                         {product.stock < 5 ? (
@@ -116,17 +130,29 @@ const ProductDetailsPage = () => {
 
                     {/* Quantity Selection */}
                     <div className="d-flex align-items-center my-3">
-                        <div>
-                            <button onClick={decreaseQuantity}>-</button>
-                            <input
-                                type="number"
-                                value={quantity}
-                                onChange={handleQuantityChange}
-                                min="1"
-                                max={product.stock}
-                            />
-                            <button onClick={increaseQuantity}>+</button>
-                        </div>
+                        <button
+                            className="btn btn-outline-secondary"
+                            onClick={decreaseQuantity}
+                            disabled={quantity <= 1}
+                        >
+                            -
+                        </button>
+                        <input
+                            type="number"
+                            className="form-control mx-2"
+                            style={{ width: '60px' }}
+                            value={quantity}
+                            onChange={handleQuantityChange}
+                            min="1"
+                            max={product.stock}
+                        />
+                        <button
+                            className="btn btn-outline-secondary"
+                            onClick={increaseQuantity}
+                            disabled={quantity >= product.stock}
+                        >
+                            +
+                        </button>
                     </div>
 
                     {/* Add to Cart / Buy Now / View Cart */}
@@ -137,13 +163,13 @@ const ProductDetailsPage = () => {
                     </div>
                 </div>
             </div>
+
             {/* Reviews Section */}
             <div className="mt-4">
                 <h3>Reviews</h3>
-                <ReviewList productId={id} />
+                <ReviewList productId={id} reviews={reviews} />
                 {user && <CreateReview productId={id} user={user} />}
             </div>
-
         </div>
     );
 };

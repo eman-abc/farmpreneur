@@ -32,9 +32,13 @@
     /* Gold color on hover */
 }
 
-.newsletter-form {
+.newsletter-container {
     display: flex;
+    justify-content: flex-end;
+    /* Align items to the right */
     align-items: center;
+    gap: 10px;
+    /* Spacing between input and button */
 }
 
 .newsletter-input {
@@ -46,14 +50,16 @@
     /* Maroon text */
     border-radius: 4px;
     padding: 8px;
-    width: 100%;
-    /* Full width for responsiveness */
+    width: 200px;
+    /* Reduced width for the input box */
+    transition: width 0.3s ease;
+    /* Smooth transition for width changes */
 }
 
 .newsletter-input:focus {
     outline: none;
-    box-shadow: 0 0 5px #ffd700;
-    /* Focus glow effect */
+    width: 220px;
+    /* Slight expansion on focus */
 }
 
 .btn-subscribe {

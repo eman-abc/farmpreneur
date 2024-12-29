@@ -1,28 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from '../api/axios';
-import { useAuth } from '../AuthContext'; // Import useAuth to access user context
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "../api/axios";
+import { useAuth } from "../AuthContext";
+import {
+    MDBContainer,
+    MDBRow,
+    MDBCol,
+    MDBCard,
+    MDBCardBody,
+    MDBCardImage,
+    MDBTypography,
+    MDBInput,
+    MDBBtn,
+    MDBIcon,
+} from "mdb-react-ui-kit";
+import '../assets/cssfiles/cartpage.css';
+
 
 const CartPage = () => {
     const [cartItems, setCartItems] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
     const navigate = useNavigate();
-    const { user } = useAuth(); // Access user from AuthContext
+    const { user } = useAuth();
 
     useEffect(() => {
         if (!user) {
-            // If user is not logged in, redirect to login page
-            navigate('/login', { state: { from: window.location.pathname } });
+            navigate("/login", { state: { from: window.location.pathname } });
         } else {
-            // Fetch cart items only if the user is logged in
             const fetchCartItems = async () => {
                 try {
-                    const response = await axios.get('/cart', { withCredentials: true });
-                    console.log(response.data.items);
+                    const response = await axios.get("/cart", { withCredentials: true });
                     setCartItems(response.data.items);
                     calculateTotal(response.data.items);
                 } catch (err) {
-                    console.error('Error fetching cart items:', err.response?.data?.message || err.message);
+                    console.error("Error fetching cart items:", err);
                 }
             };
 
@@ -32,42 +43,38 @@ const CartPage = () => {
 
     const calculateTotal = (items) => {
         const total = items.reduce(
-            (sum, item) => sum + (item.productId ? item.productId.price * item.quantity : 0),
+            (sum, item) => sum + item.product.price * item.quantity,
             0
         );
         setTotalPrice(total);
     };
 
     const handleQuantityChange = async (productId, newQuantity) => {
-        console.log('button pressed');
         try {
-            const response = await axios.put('/cart/update', {
+            const response = await axios.put("/cart/update", {
                 productId,
                 quantity: newQuantity,
             });
             if (response.status === 200) {
-                navigate('/cart');
+                navigate("/cart");
             }
         } catch (err) {
-            console.error('Error updating cart item quantity:', err.response?.data?.message || err.message);
+            console.error("Error updating cart item quantity:", err);
         }
     };
 
     const handleRemoveItem = async (productId) => {
-        console.log('Removing item with productId:', productId);
         try {
             const response = await axios.delete(`/cart/remove/${productId}`);
-            console.log('Updated cart items:', response.data.items);
             setCartItems(response.data.items);
             calculateTotal(response.data.items);
-            navigate('/cart');
         } catch (err) {
-            console.error('Error removing cart item:', err.response ? err.response.data.message : err.message);
+            console.error("Error removing cart item:", err);
         }
     };
 
     const handleCheckout = () => {
-        navigate('/checkout', { state: { cartItems, totalPrice } });
+        navigate("/checkout", { state: { cartItems, totalPrice } });
     };
 
     if (cartItems.length === 0) {
@@ -75,80 +82,120 @@ const CartPage = () => {
     }
 
     return (
-        <div className="container my-4">
-            <h2 className="text-center mb-4">Shopping Cart</h2>
-            <div className="row">
-                <div className="col-lg-8">
-                    {cartItems.map((item) => {
-                        const product = item.productId; // Accessing product details
-                        const imageUrl = product?.imageUrl?.[0]; // Safely accessing the first image URL
-
-                        if (!product) {
-                            // Skip rendering this item if product details are null
-                            return null;
-                        }
-
-                        return (
-                            <div key={item._id} className="card mb-3 shadow-sm">
-                                <div className="row g-0 align-items-center">
-                                    <div className="col-md-3">
-                                        {/* Conditionally render image */}
-                                        {imageUrl ? (
-                                            <img
-                                                src={imageUrl}
-                                                alt={product.title}
-                                                className="img-fluid rounded"
-                                            />
-                                        ) : (
-                                            <div className="no-image">No image available</div>
-                                        )}
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="card-body">
-                                            <h5 className="card-title">{product.title}</h5>
-                                            <p className="card-text text-muted">Price: ${product.price}</p>
+        <MDBContainer className="py-5 h-100">
+            <MDBRow className="justify-content-center align-items-center h-100">
+                <MDBCol size="12">
+                    <MDBCard className="card-registration card-registration-2" style={{ borderRadius: "15px" }}>
+                        <MDBCardBody className="p-0">
+                            <MDBRow className="g-0">
+                                <MDBCol lg="8">
+                                    <div className="p-5">
+                                        <div className="d-flex justify-content-between align-items-center mb-5">
+                                            <MDBTypography tag="h1" className="fw-bold mb-0 text-black">
+                                                Shopping Cart
+                                            </MDBTypography>
+                                            <MDBTypography className="mb-0 text-muted">
+                                                {cartItems.length} items
+                                            </MDBTypography>
                                         </div>
+                                        <hr className="my-4" />
+                                        {cartItems.map((item) => {
+                                            const product = item.productId;
+                                            const imageUrl = product?.imageUrl?.[0];
+
+                                            return (
+                                                <MDBRow key={item._id} className="mb-4 d-flex justify-content-between align-items-center">
+                                                    <MDBCol md="2" lg="2" xl="2">
+                                                        {imageUrl ? (
+                                                            <MDBCardImage
+                                                                src={imageUrl}
+                                                                fluid
+                                                                className="rounded-3"
+                                                                alt={product.title}
+                                                            />
+                                                        ) : (
+                                                            <div className="no-image">No image</div>
+                                                        )}
+                                                    </MDBCol>
+                                                    <MDBCol md="3" lg="3" xl="3">
+                                                        <MDBTypography tag="h6" className="text-muted">
+                                                            {product.category || "Product"}
+                                                        </MDBTypography>
+                                                        <MDBTypography tag="h6" className="text-black mb-0">
+                                                            {product.title}
+                                                        </MDBTypography>
+                                                    </MDBCol>
+                                                    <MDBCol md="3" lg="3" xl="3" className="d-flex align-items-center">
+                                                        <MDBBtn
+                                                            color="link"
+                                                            className="px-2"
+                                                            onClick={() => handleQuantityChange(item.productId._id, Math.max(1, item.quantity - 1))}
+                                                        >
+                                                            <MDBIcon fas icon="minus" />
+                                                        </MDBBtn>
+
+                                                        <MDBInput
+                                                            type="number"
+                                                            min="1"
+                                                            value={item.quantity}
+                                                            onChange={(e) =>
+                                                                handleQuantityChange(item.productId._id, parseInt(e.target.value, 10))
+                                                            }
+                                                            size="sm"
+                                                            style={{ width: "60px" }}
+                                                        />
+
+                                                        <MDBBtn
+                                                            color="link"
+                                                            className="px-2"
+                                                            onClick={() => handleQuantityChange(item.productId._id, item.quantity + 1)}
+                                                            disabled={item.quantity >= product.stock}
+                                                        >
+                                                            <MDBIcon fas icon="plus" />
+                                                        </MDBBtn>
+                                                    </MDBCol>
+                                                    <MDBCol md="3" lg="2" xl="2" className="text-end">
+                                                        <MDBTypography tag="h6" className="mb-0">
+                                                            ${product.price.toFixed(2)}
+                                                        </MDBTypography>
+                                                    </MDBCol>
+                                                    <MDBCol md="1" lg="1" xl="1" className="text-end">
+                                                        <MDBIcon
+                                                            fas
+                                                            icon="times"
+                                                            className="text-muted"
+                                                            style={{ cursor: "pointer" }}
+                                                            onClick={() => handleRemoveItem(item.productId._id)}
+                                                        />
+                                                    </MDBCol>
+                                                </MDBRow>
+                                            );
+                                        })}
                                     </div>
-                                    <div className="col-md-3 text-center">
-                                        <div className="d-flex justify-content-center align-items-center">
-                                            <button
-                                                className="btn btn-secondary me-2"
-                                                onClick={() => handleQuantityChange(product._id, Math.max(1, item.quantity - 1))}
-                                            >
-                                                -
-                                            </button>
-                                            <span className="mx-2">{item.quantity}</span>
-                                            <button
-                                                className="btn btn-secondary ms-2"
-                                                onClick={() => handleQuantityChange(product._id, item.quantity + 1)}
-                                                disabled={item.quantity >= product.stock}
-                                            >
-                                                +
-                                            </button>
+                                </MDBCol>
+                                <MDBCol lg="4" className="bg-grey">
+                                    <div className="p-5">
+                                        <MDBTypography tag="h3" className="fw-bold mb-5 mt-2 pt-1">
+                                            Summary
+                                        </MDBTypography>
+                                        <hr className="my-4" />
+                                        <div className="d-flex justify-content-between mb-4">
+                                            <MDBTypography tag="h5" className="text-uppercase">
+                                                Total
+                                            </MDBTypography>
+                                            <MDBTypography tag="h5">${totalPrice.toFixed(2)}</MDBTypography>
                                         </div>
-                                        <button
-                                            className="btn btn-danger btn-sm mt-2"
-                                            onClick={() => handleRemoveItem(product._id)}
-                                        >
-                                            Remove
-                                        </button>
+                                        <MDBBtn color="dark" block size="lg" onClick={handleCheckout}>
+                                            Proceed to Checkout
+                                        </MDBBtn>
                                     </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-                <div className="col-lg-4">
-                    <div className="card shadow-sm p-4">
-                        <h4>Order Summary</h4>
-                        <p>Total Price: <strong>${totalPrice.toFixed(2)}</strong></p>
-                        <button className="btn btn-primary btn-block" onClick={handleCheckout}>
-                            Proceed to Checkout
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+                                </MDBCol>
+                            </MDBRow>
+                        </MDBCardBody>
+                    </MDBCard>
+                </MDBCol>
+            </MDBRow>
+        </MDBContainer>
     );
 };
 

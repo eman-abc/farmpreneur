@@ -1,0 +1,85 @@
+/* Background gradient */
+.background-radial-gradient {
+    background-image: radial-gradient(650px circle at 0% 0%,
+            hsl(218, 41%, 35%) 15%,
+            hsl(218, 41%, 30%) 35%,
+            hsl(218, 41%, 20%) 75%,
+            hsl(218, 41%, 19%) 80%,
+            transparent 100%),
+        radial-gradient(1250px circle at 100% 100%,
+            hsl(218, 41%, 45%) 15%,
+            hsl(218, 41%, 30%) 35%,
+            hsl(218, 41%, 20%) 75%,
+            hsl(218, 41%, 19%) 80%,
+            transparent 100%),
+        /* Apply image as background */
+        background-size cover,
+        /* Ensure the image covers the whole background */
+        background-position center center;
+    /* Center the image */
+    ;
+}
+
+.MDBContainer {
+    min-height: 100vh;
+    /* Ensures the container fills the full height */
+    background-size: cover;
+    background-position: center center;
+}
+
+/* Glassmorphism effect */
+.bg-glass {
+    background-color: hsla(0, 0%, 100%, 0.9) !important;
+    backdrop-filter: saturate(200%) blur(25px);
+    border-radius: 10px;
+    /* Optional, to round the corners of the card */
+}
+
+/* Adjustments for text */
+h1 {
+    color: hsl(218, 81%, 95%);
+}
+
+h1 span {
+    color: hsla(180, 5%, 4%, 0.527);
+}
+
+p {
+    color: hsla(240, 6%, 7%, 0.751);
+}
+
+/* Input styling */
+.MDBInput {
+    border-radius: 8px;
+}
+
+/* Button styling */
+.MDBBtn {
+    background-color: rgb(230, 104, 14) !important;
+    color: white !important;
+    border-radius: 10px;
+}
+
+.MDBContainer .MDBBtn {
+    background-color: rgb(230, 104, 14) !important;
+}
+
+.MDBContainer .MDBBtn:hover {
+    background-color: orangered !important;
+}
+
+
+/* Error message styling */
+.text-danger {
+    font-size: 1.1em;
+}
+
+/* Form adjustments */
+form {
+    padding: 15px;
+}
+
+/* Text center alignment */
+.text-center {
+    text-align: center;
+}

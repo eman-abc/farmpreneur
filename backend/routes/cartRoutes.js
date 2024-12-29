@@ -8,70 +8,52 @@ const { ObjectId } = require('mongoose').Types;
 
 
 router.post('/add', authMiddleware, async (req, res) => {
-    console.log('Authenticated user in /add route beginning:', req.user);  // Debugging line
     try {
-        // Debugging: log the whole request object
-        console.log('Request body:', req.body);
-        console.log('User from session:', req.user);
+        const userId = req.user._id; // Authenticated user's ID
+        const { productId, quantity } = req.body;
 
-        const { product, quantity } = req.body;
-        console.log('Product:', product);  // Debugging: ensure product is correctly extracted
-        console.log('Productid:', product._id);
-        const productId = product._id;  // Ensure productId is correctly extracted
-
-        console.log('ProductId:', productId);  // Debugging: check if productId is being extracted
+        console.log('User ID:', userId);
+        console.log('Product ID:', productId);
         console.log('Quantity:', quantity);
 
-        if (!req.user || !req.user._id) {
-            return res.status(400).json({ message: 'User ID not found' });
+        // Check if the product exists
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
         }
 
-        // Validate input
-        if (!productId || quantity <= 0) {
-            return res.status(400).json({ message: 'Invalid product or quantity 1' });
+        // Check if the cart exists for the user
+        let cart = await Cart.findOne({ userId });
 
-        }
-
-        // Fetch product to check stock availability
-        const productFromDb = await Product.findById(productId);
-        if (!productFromDb || productFromDb.stock < quantity) {
-            return res.status(400).json({ message: 'Product not available in the requested quantity' });
-        }
-
-        // Find or create the user's cart
-        let cart = await Cart.findOne({ userId: req.user._id });
         if (!cart) {
-            console.log('no cart');
-            cart = new Cart({ userId: req.user._id, items: [] });
-            console.log(cart);
+            console.log('No cart found. Creating a new cart...');
+            cart = new Cart({ userId, items: [] });
         }
-        console.log('Checking cart existence...');
-        cart = await Cart.findOne({ userId: req.user._id });
-        console.log('Cart found:', cart); // Should log null or the cart object
 
-        // Check if product already exists in the cart
-        const existingItem = cart.items.find(item => item.productId.toString() === productId);
-        if (existingItem) {
-            existingItem.quantity += quantity;
+        // Check if the product is already in the cart
+        const existingItemIndex = cart.items.findIndex(
+            (item) => item.productId.toString() === productId
+        );
+
+        if (existingItemIndex > -1) {
+            // Update quantity if the product is already in the cart
+            cart.items[existingItemIndex].quantity += quantity;
         } else {
+            // Add new product to the cart
             cart.items.push({ productId, quantity });
         }
 
-        // Save cart and respond
-        try {
-            await cart.save();
-            console.log('Cart saved successfully:', cart);
-        } catch (saveError) {
-            console.error('Error saving cart:', saveError);
-        }
+        // Save the updated cart
+        await cart.save();
 
-        await Product.findByIdAndUpdate(productId, { $inc: { stock: -quantity } });
+        console.log('Cart updated:', cart);
         res.status(200).json({ message: 'Product added to cart', cart });
-    } catch (error) {
-        console.error('Error adding to cart:', error);
-        res.status(500).json({ message: 'Server error' });
+    } catch (err) {
+        console.error('Error adding to cart:', err);
+        res.status(500).json({ message: 'Failed to add product to cart' });
     }
 });
+
 
 
 router.put('/update', authMiddleware, async (req, res) => {

@@ -37,6 +37,7 @@ const MarketplacePage = () => {
         }
 
         console.log("User from context:", user); // Ensure user is being fetched from context
+        console.log('Adding to cart, Product ID:', product._id, 'Quantity:', 1);
 
         if (!product || !product._id) {
             console.error("Product ID is missing or undefined.");
@@ -47,7 +48,7 @@ const MarketplacePage = () => {
             // Send the product and quantity to the backend to add to the cart
             const response = await axiosInstance.post(
                 'cart/add',
-                { product, quantity: 1 }, // Adjust quantity as per your requirement
+                { productId: product._id, quantity: 1 }, // Correctly set productId and quantity
                 {
                     withCredentials: true,  // Include cookies with the request
                     headers: {
@@ -62,6 +63,7 @@ const MarketplacePage = () => {
             console.error('Error adding to cart:', error.response?.data || error.message);
         }
     };
+
 
 
     // Handle Card Click (Navigate to Product Details)
