@@ -17,6 +17,7 @@ const Checkout = () => {
     const [paymentMethod, setPaymentMethod] = useState('');
     const [total, setTotal] = useState(0);
     const navigate = useNavigate();
+    const [submitted, setSubmitted] = useState(false); // Add this state
 
     // Fetch cart details on page load
     useEffect(() => {
@@ -42,28 +43,34 @@ const Checkout = () => {
         setPaymentMethod(e.target.value);
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async () => {
+        if (submitted) return; // Prevent multiple submissions
+
+        setSubmitted(true); // Set submitted flag
         try {
-            console.log('try block');
+            const filteredCartItems = cart.items.filter((item) => item.productId); // Filter out items with null productId
             const orderDetails = {
                 shippingInfo,
                 paymentMethod,
-                cartItems: cart.items,
-                totalAmount: total,
+                cartItems: filteredCartItems,
+                totalAmount: calculateTotalAmount(filteredCartItems),
             };
-            console.log('order details');
-            console.log(orderDetails);
-            const response = await axios.post('/checkout', orderDetails);
-            if (response.status === 200) {
-                // After successful checkout, redirect to the confirmation page
-                navigate('/order-confirmation', { state: { order: orderDetails } });
 
+            const response = await axios.post('http://localhost:5000/api/checkout', orderDetails);
+            if (response.status === 200) {
+                console.log('order successfulll');
+                navigate('/order-confirmation', { state: { order: response.data } });
             }
-        } catch (err) {
-            console.error('Error during checkout:', err);
+        } catch (error) {
+            console.error('Error during checkout:', error);
+            alert('There was an issue placing your order. Please try again.');
         }
     };
+
+    const calculateTotalAmount = (cartItems) => {
+        return cartItems.reduce((total, item) => total + (item.productId?.price || 0) * item.quantity, 0);
+    };
+
 
     if (!cart) return <div>Loading...</div>;
 
@@ -169,14 +176,22 @@ const Checkout = () => {
                 <h2>Order Summary</h2>
                 <div>
                     {cart.items.map((item, index) => (
-                        <div key={index}>
-                            <img src={item.productId.image} alt={item.productId.name} />
-                            <span>{item.productId.name}</span>
-                            <span>Qty: {item.quantity}</span>
-                            <span>Price: Rs {item.productId.price}</span>
-                        </div>
+                        item.productId ? (
+                            <div key={index}>
+                                <img src={item.productId.image} alt={item.productId.name} />
+                                <span>{item.productId.name}</span>
+                                <span>Qty: {item.quantity}</span>
+                                <span>Price: Rs {item.productId.price}</span>
+                            </div>
+                        ) : (
+                            <div key={index}>
+                                <span>Product details unavailable</span>
+                                <span>Qty: {item.quantity}</span>
+                            </div>
+                        )
                     ))}
                 </div>
+
 
                 <div className="cost-summary">
                     <div>Subtotal: Rs {total - 1}</div>

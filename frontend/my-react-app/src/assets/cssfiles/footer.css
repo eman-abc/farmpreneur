@@ -1,0 +1,92 @@
+.footer-custom {
+    background-color: #5c2c15;
+    /* Earthy maroon tone */
+    font-family: 'Georgia', serif;
+    color: #f5f5dc;
+    /* Beige text */
+    padding: 20px 0;
+}
+
+.footer-section {
+    margin-bottom: 20px;
+}
+
+.footer-custom h5 {
+    font-weight: bold;
+    color: #ffd700;
+    /* Gold color for headings */
+}
+
+.footer-custom p,
+.footer-custom a {
+    color: #f5f5dc;
+    /* Beige text */
+    text-decoration: none;
+    /* Remove underline */
+    transition: color 0.3s ease;
+    /* Smooth transition for hover effect */
+}
+
+.footer-custom a:hover {
+    color: #ffd700;
+    /* Gold color on hover */
+}
+
+.newsletter-form {
+    display: flex;
+    align-items: center;
+}
+
+.newsletter-input {
+    border: 1px solid #f5f5dc;
+    /* Beige border */
+    background-color: #f5f5dc;
+    /* Beige background */
+    color: #79444c;
+    /* Maroon text */
+    border-radius: 4px;
+    padding: 8px;
+    width: 100%;
+    /* Full width for responsiveness */
+}
+
+.newsletter-input:focus {
+    outline: none;
+    box-shadow: 0 0 5px #ffd700;
+    /* Focus glow effect */
+}
+
+.btn-subscribe {
+    background-color: #ffd700;
+    /* Gold button */
+    color: #79444c;
+    /* Maroon text */
+    font-weight: bold;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-subscribe:hover {
+    background-color: #f0c808;
+    /* Lighter gold on hover */
+}
+
+.footer-divider {
+    border-top: 1px solid #f5f5dc;
+    /* Beige divider line */
+}
+
+.social-icons a {
+    color: #f5f5dc;
+    /* Beige color for icons */
+    font-size: 1.5rem;
+    /* Icon size */
+    margin-right: 15px;
+}
+
+.social-icons a:hover {
+    color: #ffd700;
+    /* Gold color on hover */
+}

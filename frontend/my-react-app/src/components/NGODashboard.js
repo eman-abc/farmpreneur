@@ -177,27 +177,30 @@ const NGODashboard = () => {
                 </form>
 
                 <ul>
-                    {resources.map((resource) => (
-                        <li key={resource._id}>
-                            <h3>{resource.title}</h3>
-                            {/* <p>Type: {resource.type}</p> Corrected line */}
-                            <p>Description: {resource.description}</p>
-                            <p>Category: {resource.category}</p>
-                            <p>URL: <a href={resource.url} target="_blank" rel="noopener noreferrer">{resource.url}</a></p>
-                            <button onClick={() => {
-                                setEditingResource(resource);
-                                setNewResource({
-                                    title: resource.title,
-                                    url: resource.url,
-                                    description: resource.description,
-                                    type: resource.type,
-                                    category: resource.category
-                                });
-                            }}>Edit</button>
-                            <button onClick={() => handleDeleteResource(resource._id)}>Delete</button>
-                        </li>
-                    ))}
+                    {resources.length === 0 ? (
+                        <p>No resources available.</p> // Message when there are no resources
+                    ) : (
+                        resources.map((resource) => (
+                            <li key={resource._id}>
+                                <h3>{resource.title}</h3>
+                                <p>Description: {resource.description}</p>
+                                <p>Category: {resource.category}</p>
+                                <p>URL: <a href={resource.url} target="_blank" rel="noopener noreferrer">{resource.url}</a></p>
+                                <button onClick={() => {
+                                    setEditingResource(resource);
+                                    setNewResource({
+                                        title: resource.title,
+                                        url: resource.url,
+                                        description: resource.description,
+                                        category: resource.category
+                                    });
+                                }}>Edit</button>
+                                <button onClick={() => handleDeleteResource(resource._id)}>Delete</button>
+                            </li>
+                        ))
+                    )}
                 </ul>
+
             </section>
 
             {/* Aid Program Management */}

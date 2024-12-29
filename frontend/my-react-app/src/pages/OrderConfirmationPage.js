@@ -32,13 +32,20 @@ const OrderConfirmationPage = () => {
 
             <h3>Order Items</h3>
             <ul>
-                {orderDetails.cartItems.map((item) => (
-                    <li key={item.productId._id}>
-                        <img src={item.productId.imageUrl[0]} alt={item.productId.title} width="50" />
-                        {item.productId.title} - Quantity: {item.quantity} - Price: ${item.quantity * item.productId.price}
-                    </li>
+                {orderDetails.cartItems.map((item, index) => (
+                    item.productId ? (
+                        <li key={index}>
+                            <img src={item.productId.imageUrl[0]} alt={item.productId.title} width="50" />
+                            {item.productId.title} - Quantity: {item.quantity} - Price: ${item.quantity * item.productId.price}
+                        </li>
+                    ) : (
+                        <li key={index}>
+                            Product details unavailable - Quantity: {item.quantity}
+                        </li>
+                    )
                 ))}
             </ul>
+
 
             <h3>Total Amount: ${orderDetails.totalAmount}</h3>
         </div>

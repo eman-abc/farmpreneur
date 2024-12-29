@@ -7,7 +7,7 @@ const CartPage = () => {
     const [cartItems, setCartItems] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
     const navigate = useNavigate();
-    const { user } = useAuth();  // Access user from AuthContext
+    const { user } = useAuth(); // Access user from AuthContext
 
     useEffect(() => {
         if (!user) {
@@ -31,12 +31,15 @@ const CartPage = () => {
     }, [user, navigate]);
 
     const calculateTotal = (items) => {
-        const total = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+        const total = items.reduce(
+            (sum, item) => sum + (item.productId ? item.productId.price * item.quantity : 0),
+            0
+        );
         setTotalPrice(total);
     };
 
     const handleQuantityChange = async (productId, newQuantity) => {
-        console.log('button presssed')
+        console.log('button pressed');
         try {
             const response = await axios.put('/cart/update', {
                 productId,
@@ -51,12 +54,13 @@ const CartPage = () => {
     };
 
     const handleRemoveItem = async (productId) => {
-        console.log('Removing item with productId:', productId);  // Debugging line
+        console.log('Removing item with productId:', productId);
         try {
             const response = await axios.delete(`/cart/remove/${productId}`);
-            console.log('Updated cart items:', response.data.items);  // Debugging line
-            setCartItems(response.data.items);  // Set the updated cart items in the state
-            calculateTotal(response.data.items);  // Recalculate the total based on the updated cart items
+            console.log('Updated cart items:', response.data.items);
+            setCartItems(response.data.items);
+            calculateTotal(response.data.items);
+            navigate('/cart');
         } catch (err) {
             console.error('Error removing cart item:', err.response ? err.response.data.message : err.message);
         }
@@ -79,6 +83,11 @@ const CartPage = () => {
                         const product = item.productId; // Accessing product details
                         const imageUrl = product?.imageUrl?.[0]; // Safely accessing the first image URL
 
+                        if (!product) {
+                            // Skip rendering this item if product details are null
+                            return null;
+                        }
+
                         return (
                             <div key={item._id} className="card mb-3 shadow-sm">
                                 <div className="row g-0 align-items-center">
@@ -91,7 +100,7 @@ const CartPage = () => {
                                                 className="img-fluid rounded"
                                             />
                                         ) : (
-                                            <div className="no-image">No image available</div> // Fallback if imageUrl is undefined
+                                            <div className="no-image">No image available</div>
                                         )}
                                     </div>
                                     <div className="col-md-6">
@@ -104,14 +113,14 @@ const CartPage = () => {
                                         <div className="d-flex justify-content-center align-items-center">
                                             <button
                                                 className="btn btn-secondary me-2"
-                                                onClick={() => handleQuantityChange(item.productId._id, Math.max(1, item.quantity - 1))}
+                                                onClick={() => handleQuantityChange(product._id, Math.max(1, item.quantity - 1))}
                                             >
                                                 -
                                             </button>
                                             <span className="mx-2">{item.quantity}</span>
                                             <button
                                                 className="btn btn-secondary ms-2"
-                                                onClick={() => handleQuantityChange(item.productId._id, item.quantity + 1)}
+                                                onClick={() => handleQuantityChange(product._id, item.quantity + 1)}
                                                 disabled={item.quantity >= product.stock}
                                             >
                                                 +
@@ -119,7 +128,7 @@ const CartPage = () => {
                                         </div>
                                         <button
                                             className="btn btn-danger btn-sm mt-2"
-                                            onClick={() => handleRemoveItem(item.productId._id)}
+                                            onClick={() => handleRemoveItem(product._id)}
                                         >
                                             Remove
                                         </button>
@@ -141,7 +150,6 @@ const CartPage = () => {
             </div>
         </div>
     );
-
 };
 
 export default CartPage;
