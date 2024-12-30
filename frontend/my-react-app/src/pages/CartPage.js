@@ -16,7 +16,6 @@ import {
 } from "mdb-react-ui-kit";
 import '../assets/cssfiles/cartpage.css';
 
-
 const CartPage = () => {
     const [cartItems, setCartItems] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
@@ -43,7 +42,7 @@ const CartPage = () => {
 
     const calculateTotal = (items) => {
         const total = items.reduce(
-            (sum, item) => sum + item.product.price * item.quantity,
+            (sum, item) => sum + item.productId.price * item.quantity,
             0
         );
         setTotalPrice(total);
@@ -56,7 +55,9 @@ const CartPage = () => {
                 quantity: newQuantity,
             });
             if (response.status === 200) {
-                navigate("/cart");
+                const updatedItems = response.data.items;
+                setCartItems(updatedItems);
+                calculateTotal(updatedItems);
             }
         } catch (err) {
             console.error("Error updating cart item quantity:", err);
@@ -65,9 +66,10 @@ const CartPage = () => {
 
     const handleRemoveItem = async (productId) => {
         try {
-            const response = await axios.delete(`/cart/remove/${productId}`);
-            setCartItems(response.data.items);
-            calculateTotal(response.data.items);
+            const response = await axios.delete(`/cart/remove/${productId}`, { withCredentials: true });
+            const updatedItems = response.data.items;
+            setCartItems(updatedItems);
+            calculateTotal(updatedItems);
         } catch (err) {
             console.error("Error removing cart item:", err);
         }
@@ -156,17 +158,28 @@ const CartPage = () => {
                                                     </MDBCol>
                                                     <MDBCol md="3" lg="2" xl="2" className="text-end">
                                                         <MDBTypography tag="h6" className="mb-0">
-                                                            ${product.price.toFixed(2)}
+                                                            Rs{product.price.toFixed(2)}
                                                         </MDBTypography>
                                                     </MDBCol>
                                                     <MDBCol md="1" lg="1" xl="1" className="text-end">
-                                                        <MDBIcon
-                                                            fas
-                                                            icon="times"
-                                                            className="text-muted"
-                                                            style={{ cursor: "pointer" }}
+                                                        {/* Remove button added here */}
+                                                        <MDBBtn
+                                                            color="none" // Use 'none' to remove default color and apply custom styles
+                                                            size="sm"
+                                                            style={{
+                                                                backgroundColor: "#808000", // Olive color
+                                                                color: "white", // White text
+                                                                fontWeight: "bold", // Bold text for better visibility
+                                                                padding: "6px 12px", // Adjust padding for better size
+                                                                borderRadius: "5px", // Rounded corners
+                                                                border: "none", // Remove border
+                                                                fontSize: "14px", // Adjust font size if needed
+                                                                cursor: "pointer", // Change cursor to pointer to indicate clickable
+                                                            }}
                                                             onClick={() => handleRemoveItem(item.productId._id)}
-                                                        />
+                                                        >
+                                                            Remove
+                                                        </MDBBtn>
                                                     </MDBCol>
                                                 </MDBRow>
                                             );
@@ -183,7 +196,7 @@ const CartPage = () => {
                                             <MDBTypography tag="h5" className="text-uppercase">
                                                 Total
                                             </MDBTypography>
-                                            <MDBTypography tag="h5">${totalPrice.toFixed(2)}</MDBTypography>
+                                            <MDBTypography tag="h5">Rs.{totalPrice.toFixed(2)}</MDBTypography>
                                         </div>
                                         <MDBBtn color="dark" block size="lg" onClick={handleCheckout}>
                                             Proceed to Checkout

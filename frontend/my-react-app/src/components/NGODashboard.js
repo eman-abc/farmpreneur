@@ -1,7 +1,5 @@
-// src/components/NGODashboard.js
 import React, { useState, useEffect } from 'react';
-import axios from '../api/axios'; // Adjust path to your Axios instance
-// import './NGODashboard.css'; // Optional: Add your custom styles
+import axios from '../api/axios';
 
 const NGODashboard = () => {
     const [resources, setResources] = useState([]);
@@ -22,7 +20,6 @@ const NGODashboard = () => {
     const [editingResource, setEditingResource] = useState(null);
     const [editingAid, setEditingAid] = useState(null);
 
-    // Fetch resources and aid programs data
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
@@ -44,7 +41,6 @@ const NGODashboard = () => {
         fetchDashboardData();
     }, []);
 
-    // Add a new resource
     const handleAddResource = async () => {
         try {
             const response = await axios.post('/resource', newResource);
@@ -55,7 +51,6 @@ const NGODashboard = () => {
         }
     };
 
-    // Update resource
     const handleUpdateResource = async () => {
         try {
             const response = await axios.put(`/resource/${editingResource._id}`, newResource);
@@ -69,7 +64,6 @@ const NGODashboard = () => {
         }
     };
 
-    // Delete resource
     const handleDeleteResource = async (id) => {
         try {
             await axios.delete(`/resource/${id}`);
@@ -79,7 +73,6 @@ const NGODashboard = () => {
         }
     };
 
-    // Add a new aid program
     const handleAddAidProgram = async () => {
         try {
             const response = await axios.post('/aid', newAid);
@@ -90,7 +83,6 @@ const NGODashboard = () => {
         }
     };
 
-    // Update aid program
     const handleUpdateAidProgram = async () => {
         try {
             const response = await axios.put(`/aid/${editingAid._id}`, newAid);
@@ -104,7 +96,6 @@ const NGODashboard = () => {
         }
     };
 
-    // Delete aid program
     const handleDeleteAidProgram = async (id) => {
         try {
             await axios.delete(`/aid/${id}`);
@@ -118,12 +109,11 @@ const NGODashboard = () => {
     if (error) return <div>{error}</div>;
 
     return (
-        <div className="ngo-dashboard">
-            <h1>NGO Dashboard</h1>
+        <div style={{ backgroundColor: '#EDE1D2', padding: '20px', fontFamily: 'Arial, sans-serif', color: '#412F26' }}>
+            <h1 style={{ color: '#6A6F4C', textAlign: 'center' }}>NGO Dashboard</h1>
 
-            {/* Resource Management */}
-            <section>
-                <h2>Manage Resources</h2>
+            <section style={{ marginBottom: '30px' }}>
+                <h2 style={{ color: '#5D2510' }}>Manage Resources</h2>
                 <form
                     onSubmit={(e) => {
                         e.preventDefault();
@@ -133,6 +123,7 @@ const NGODashboard = () => {
                             handleAddResource();
                         }
                     }}
+                    style={{ marginBottom: '20px' }}
                 >
                     <input
                         type="text"
@@ -140,52 +131,48 @@ const NGODashboard = () => {
                         value={newResource.title}
                         onChange={(e) => setNewResource({ ...newResource, title: e.target.value })}
                         required
+                        style={{ display: 'block', width: '100%', padding: '8px', marginBottom: '10px', border: '1px solid #806044', borderRadius: '5px' }}
                     />
                     <textarea
                         placeholder="Resource URL"
                         value={newResource.url}
                         onChange={(e) => setNewResource({ ...newResource, url: e.target.value })}
                         required
+                        style={{ display: 'block', width: '100%', padding: '8px', marginBottom: '10px', border: '1px solid #806044', borderRadius: '5px' }}
                     ></textarea>
                     <textarea
                         placeholder="Resource Description"
                         value={newResource.description}
                         onChange={(e) => setNewResource({ ...newResource, description: e.target.value })}
                         required
+                        style={{ display: 'block', width: '100%', padding: '8px', marginBottom: '10px', border: '1px solid #806044', borderRadius: '5px' }}
                     ></textarea>
-                    {/* <select
-                        value={newResource.type}
-                        onChange={(e) => setNewResource({ ...newResource, type: e.target.value })}
-                        required
-                    >
-                        <option value="">Select Resource Type</option>
-                        <option value="PDF">PDF</option>
-                        <option value="Video">Video</option>
-                        <option value="Link">Link</option>
-                    </select> */}
                     <select
                         value={newResource.category}
                         onChange={(e) => setNewResource({ ...newResource, category: e.target.value })}
                         required
+                        style={{ display: 'block', width: '100%', padding: '8px', marginBottom: '10px', border: '1px solid #806044', borderRadius: '5px', backgroundColor: '#FFF' }}
                     >
                         <option value="">Select Category</option>
                         <option value="Marketing">Marketing</option>
                         <option value="Finance">Finance</option>
                         <option value="Product Development">Product Development</option>
                     </select>
-                    <button type="submit">{editingResource ? 'Update Resource' : 'Add Resource'}</button>
+                    <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#806044', color: '#FFF', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+                        {editingResource ? 'Update Resource' : 'Add Resource'}
+                    </button>
                 </form>
 
-                <ul>
+                <ul style={{ listStyleType: 'none', padding: '0' }}>
                     {resources.length === 0 ? (
-                        <p>No resources available.</p> // Message when there are no resources
+                        <p>No resources available.</p>
                     ) : (
                         resources.map((resource) => (
-                            <li key={resource._id}>
+                            <li key={resource._id} style={{ border: '1px solid #806044', padding: '10px', marginBottom: '10px', borderRadius: '5px' }}>
                                 <h3>{resource.title}</h3>
                                 <p>Description: {resource.description}</p>
                                 <p>Category: {resource.category}</p>
-                                <p>URL: <a href={resource.url} target="_blank" rel="noopener noreferrer">{resource.url}</a></p>
+                                <p>URL: <a href={resource.url} target="_blank" rel="noopener noreferrer" style={{ color: '#5D2510' }}>{resource.url}</a></p>
                                 <button onClick={() => {
                                     setEditingResource(resource);
                                     setNewResource({
@@ -194,18 +181,16 @@ const NGODashboard = () => {
                                         description: resource.description,
                                         category: resource.category
                                     });
-                                }}>Edit</button>
-                                <button onClick={() => handleDeleteResource(resource._id)}>Delete</button>
+                                }} style={{ padding: '5px 10px', marginRight: '10px', backgroundColor: '#5D2510', color: '#FFF', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Edit</button>
+                                <button onClick={() => handleDeleteResource(resource._id)} style={{ padding: '5px 10px', backgroundColor: '#412F26', color: '#FFF', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Delete</button>
                             </li>
                         ))
                     )}
                 </ul>
-
             </section>
 
-            {/* Aid Program Management */}
             <section>
-                <h2>Manage Aid Programs</h2>
+                <h2 style={{ color: '#5D2510' }}>Manage Aid Programs</h2>
                 <form
                     onSubmit={(e) => {
                         e.preventDefault();
@@ -215,6 +200,7 @@ const NGODashboard = () => {
                             handleAddAidProgram();
                         }
                     }}
+                    style={{ marginBottom: '20px' }}
                 >
                     <input
                         type="text"
@@ -222,12 +208,14 @@ const NGODashboard = () => {
                         value={newAid.title}
                         onChange={(e) => setNewAid({ ...newAid, title: e.target.value })}
                         required
+                        style={{ display: 'block', width: '100%', padding: '8px', marginBottom: '10px', border: '1px solid #806044', borderRadius: '5px' }}
                     />
                     <textarea
                         placeholder="Aid Description"
                         value={newAid.description}
                         onChange={(e) => setNewAid({ ...newAid, description: e.target.value })}
                         required
+                        style={{ display: 'block', width: '100%', padding: '8px', marginBottom: '10px', border: '1px solid #806044', borderRadius: '5px' }}
                     ></textarea>
                     <input
                         type="number"
@@ -235,13 +223,16 @@ const NGODashboard = () => {
                         value={newAid.amount}
                         onChange={(e) => setNewAid({ ...newAid, amount: e.target.value })}
                         required
+                        style={{ display: 'block', width: '100%', padding: '8px', marginBottom: '10px', border: '1px solid #806044', borderRadius: '5px' }}
                     />
-                    <button type="submit">{editingAid ? 'Update Aid Program' : 'Add Aid Program'}</button>
+                    <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#806044', color: '#FFF', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+                        {editingAid ? 'Update Aid Program' : 'Add Aid Program'}
+                    </button>
                 </form>
 
-                <ul>
+                <ul style={{ listStyleType: 'none', padding: '0' }}>
                     {aidPrograms.map((aid) => (
-                        <li key={aid._id}>
+                        <li key={aid._id} style={{ border: '1px solid #806044', padding: '10px', marginBottom: '10px', borderRadius: '5px' }}>
                             <h3>{aid.title}</h3>
                             <p>{aid.description}</p>
                             <p>Amount: {aid.amount}</p>
@@ -252,8 +243,8 @@ const NGODashboard = () => {
                                     description: aid.description,
                                     amount: aid.amount
                                 });
-                            }}>Edit</button>
-                            <button onClick={() => handleDeleteAidProgram(aid._id)}>Delete</button>
+                            }} style={{ padding: '5px 10px', marginRight: '10px', backgroundColor: '#5D2510', color: '#FFF', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Edit</button>
+                            <button onClick={() => handleDeleteAidProgram(aid._id)} style={{ padding: '5px 10px', backgroundColor: '#412F26', color: '#FFF', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Delete</button>
                         </li>
                     ))}
                 </ul>

@@ -1,0 +1,166 @@
+/* Scoped styles for the MarketplacePage */
+.marketplace-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #EDE1D2;
+    /* Coconut - Soft off-white background */
+    padding: 20px;
+}
+
+/* Ensure all cards are the same height */
+.marketplace-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: #CBB89D;
+    /* Butter - Creamy beige */
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.marketplace-card:hover {
+    transform: scale(1.05);
+}
+
+/* Ensure that images inside the cards are the same size */
+.marketplace-card-img {
+    height: 200px;
+    /* Set a fixed height */
+    object-fit: cover;
+    /* Crop and cover the area of the image */
+    width: 100%;
+    /* Make the image fill the width of the card */
+}
+
+/* Set uniform height for card body and title */
+.marketplace-card-body {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
+    /* Ensures that content inside card body is spaced out */
+    padding: 15px;
+    background-color: #CBB89D;
+    /* Coconut - Soft off-white for card body */
+}
+
+.marketplace-card-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #412F26;
+    /* Cocoa - Rich dark brown */
+    margin-bottom: 10px;
+}
+
+.marketplace-card-description {
+    font-size: 16px;
+    color: #806044;
+    /* Natural - Warm brown */
+    margin-bottom: 15px;
+}
+
+/* Buttons inside the card */
+.marketplace-card-body .btn {
+    background-color: #6A6F4C;
+    /* Organic - Muted olive green */
+    color: #EDE1D2;
+    /* Coconut - Soft off-white */
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.marketplace-card-body .btn:hover {
+    background-color: #5D2510;
+    /* Palm Oil - Deep reddish-brown */
+    transform: scale(1.05);
+}
+
+/* Styling for the pagination buttons */
+.marketplace-pagination button {
+    width: 45%;
+    /* Set the width of the pagination buttons */
+    background-color: #806044;
+    /* Natural - Warm brown */
+    color: #EDE1D2;
+    /* Coconut - Soft off-white */
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.marketplace-pagination button:hover {
+    background-color: #5D2510;
+    /* Palm Oil - Deep reddish-brown */
+}
+
+/* Form Inputs */
+input[type="text"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #EDE1D2;
+    /* Coconut - Soft off-white */
+    border: 1px solid #806044;
+    /* Natural - Warm brown */
+    border-radius: 5px;
+    color: #412F26;
+    /* Cocoa - Rich dark brown */
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+    outline: none;
+    border-color: #6A6F4C;
+    /* Organic - Muted olive green */
+}
+
+/* Styling for search input */
+input[type="text"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #F1E4D2;
+    /* Soft Beige */
+    border: 1px solid #806044;
+    /* Natural - Warm brown */
+    color: #412F26;
+    /* Cocoa - Rich dark brown */
+}
+
+/* Filters Section */
+.row.mb-4 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.row.mb-4 .form-control {
+    flex: 1;
+    min-width: 200px;
+    border: 1px solid #806044 !important;
+    /* Natural */
+    border-radius: 5px;
+    padding: 8px;
+    background-color: #EDE1D2 !important;
+    /* Coconut */
+    color: #412F26 !important;
+    /* Cocoa */
+}
+
+.row.mb-4 .form-control:focus {
+    outline: none;
+    border-color: #6A6F4C !important;
+    /* Organic */
+}

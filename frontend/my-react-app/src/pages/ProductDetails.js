@@ -112,7 +112,7 @@ const ProductDetailsPage = () => {
                 <div className="col-md-6">
                     <h2 className="text-primary">{product.title}</h2>
                     <p>{product.description}</p>
-                    <p><strong>Price:</strong> ${product.price}</p>
+                    <p><strong>Price:</strong> Rs{product.price}</p>
                     <p><strong>Category:</strong> {product.category}</p>
                     <p>
                         <strong>Seller:</strong>{' '}

@@ -1,0 +1,345 @@
+import React, { useEffect, useState } from 'react';
+import axiosInstance from '../api/axios'; // Import the Axios instance
+import ResourceList from './ResourceList';
+import AidList from './AidList';
+import { Button, Form, Table, Card } from 'react-bootstrap'; // Import Bootstrap components
+
+const EntrepreneurDashboard = () => {
+    const [products, setProducts] = useState([]);
+    const [editingProduct, setEditingProduct] = useState(null);
+    const [formData, setFormData] = useState({
+        title: '',
+        price: '',
+        status: 'Available',
+        category: '',
+        stock: '',
+        description: ''
+    });
+    const [sessions, setSessions] = useState({
+        upcomingSessions: [],
+        pendingSessions: [],
+        completedSessions: [],
+    });
+    const [mentors, setMentors] = useState([]);
+    const [newSessionRequest, setNewSessionRequest] = useState({
+        mentorId: '',
+        schedule: '',
+        topics: '',
+    });
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const productResponse = await axiosInstance.get('/dashboard/entrepreneur/products');
+                console.log(productResponse);
+                setProducts(productResponse.data.products);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
+
+            try {
+                const mentorResponse = await axiosInstance.get('entrepreneur/mentors');
+                setMentors(mentorResponse.data);
+            } catch (error) {
+                console.error('Error fetching mentors:', error);
+            }
+
+            try {
+                const sessionResponse = await axiosInstance.get('/entrepreneur/sessions');
+                const data = sessionResponse.data;
+                setSessions({
+                    upcomingSessions: data.filter(session => session.status === 'Upcoming'),
+                    pendingSessions: data.filter(session => session.status === 'Pending'),
+                    completedSessions: data.filter(session => session.status === 'Completed')
+                });
+            } catch (error) {
+                console.error('Error fetching sessions:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    const handleDeleteProduct = async (productId) => {
+        try {
+            await axiosInstance.delete('/dashboard/entrepreneur/products/${productId}');
+            setProducts(products.filter(product => product._id !== productId));
+        } catch (error) {
+            console.error('Error deleting product:', error);
+        }
+    };
+
+    const handleEditProduct = (product) => {
+        setEditingProduct(product);
+        setFormData({
+            title: product.title,
+            price: product.price,
+            status: product.status,
+            category: product.category,
+            stock: product.stock,
+        });
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }));
+    };
+
+    const handleUpdateProduct = async (e) => {
+        e.preventDefault();
+        try {
+            const updatedProduct = { ...formData };
+            await axiosInstance.put('/dashboard/entrepreneur/products/${editingProduct._id}', updatedProduct);
+            setEditingProduct(null);
+            setFormData({
+                title: '',
+                price: '',
+                status: '',
+                category: '',
+                stock: '',
+            });
+        } catch (error) {
+            console.error('Error updating product:', error);
+        }
+    };
+
+    const handleAddNewProduct = async (e) => {
+        e.preventDefault();
+        try {
+            const newProduct = {
+                ...formData,
+            };
+
+            const response = await axiosInstance.post('/dashboard/entrepreneur/products', newProduct);
+            setProducts([...products, response.data.product]);
+            setFormData({
+                title: '',
+                price: '',
+                status: '',
+                category: '',
+                stock: '',
+                description: '',
+            });
+        } catch (error) {
+            console.error('Error adding product:', error);
+        }
+    };
+
+    return (
+        <div className="container mt-4">
+            <h2 className="text-center mb-4">Welcome, Entrepreneur</h2>
+
+            {/* Add New Product Form */}
+            <Card className="mb-4">
+                <Card.Header as="h5">Add New Product</Card.Header>
+                <Card.Body>
+                    <Form onSubmit={handleAddNewProduct}>
+                        <div className="row mb-3">
+                            <div className="col-md-6">
+                                <Form.Label>Product Title</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="title"
+                                    value={formData.title}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </div>
+                            <div className="col-md-6">
+                                <Form.Label>Product Description</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="row mb-3">
+                            <div className="col-md-6">
+                                <Form.Label>Price</Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    name="price"
+                                    value={formData.price}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </div>
+                            <div className="col-md-6">
+                                <Form.Label>Status</Form.Label>
+                                <Form.Select
+                                    name="status"
+                                    value={formData.status}
+                                    onChange={handleInputChange}
+                                    required
+                                >
+                                    <option value="Available">Available</option>
+                                    <option value="Out of Stock">Out of Stock</option>
+                                    <option value="Discontinued">Discontinued</option>
+                                </Form.Select>
+                            </div>
+                        </div>
+
+                        <div className="row mb-3">
+                            <div className="col-md-6">
+                                <Form.Label>Category</Form.Label>
+                                <Form.Select
+                                    name="category"
+                                    value={formData.category}
+                                    onChange={handleInputChange}
+                                    required
+                                >
+                                    <option value="Handicrafts">Handicrafts</option>
+                                    <option value="Organic Produce">Organic Produce</option>
+                                </Form.Select>
+                            </div>
+                            <div className="col-md-6">
+                                <Form.Label>Stock</Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    name="stock"
+                                    value={formData.stock}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <Button variant="primary" type="submit">
+                            Add Product
+                        </Button>
+                    </Form>
+                </Card.Body>
+            </Card>
+
+            {/* Edit Product Modal/Form */}
+            {editingProduct && (
+                <Card className="mb-4">
+                    <Card.Header as="h5">Edit Product</Card.Header>
+                    <Card.Body>
+                        <Form onSubmit={handleUpdateProduct}>
+                            <div className="row mb-3">
+                                <div className="col-md-6">
+                                    <Form.Label>Product Title</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        name="title"
+                                        value={formData.title}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="col-md-6">
+                                    <Form.Label>Price</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        name="price"
+                                        value={formData.price}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="row mb-3">
+                                <div className="col-md-6">
+                                    <Form.Label>Status</Form.Label>
+                                    <Form.Select
+                                        name="status"
+                                        value={formData.status}
+                                        onChange={handleInputChange}
+                                        required
+                                    >
+                                        <option value="Available">Available</option>
+                                        <option value="Out of Stock">Out of Stock</option>
+                                        <option value="Discontinued">Discontinued</option>
+                                    </Form.Select>
+                                </div>
+                                <div className="col-md-6">
+                                    <Form.Label>Category</Form.Label>
+                                    <Form.Select
+                                        name="category"
+                                        value={formData.category}
+                                        onChange={handleInputChange}
+                                        required
+                                    >
+                                        <option value="Handicrafts">Handicrafts</option>
+                                        <option value="Organic Produce">Organic Produce</option>
+                                    </Form.Select>
+                                </div>
+                            </div>
+
+                            <Button variant="primary" type="submit">
+                                Update Product
+                            </Button>
+                            <Button variant="secondary" onClick={() => setEditingProduct(null)} className="ms-2">
+                                Cancel
+                            </Button>
+                        </Form>
+                    </Card.Body>
+                </Card>
+            )}
+
+            {/* Product Table */}
+            <Card className="mb-4">
+                <Card.Header as="h5">Your Products</Card.Header>
+                <Card.Body>
+                    <Table striped bordered hover responsive>
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {products.length > 0 ? (
+                                products.map((product) => (
+                                    <tr key={product._id}>
+                                        <td>{product.title}</td>
+                                        <td>${product.price}</td>
+                                        <td>{product.status}</td>
+                                        <td>
+                                            <Button
+                                                variant="warning"
+                                                onClick={() => handleEditProduct(product)}
+                                                className="me-2"
+                                            >
+                                                Edit
+                                            </Button>
+                                            <Button
+                                                variant="danger"
+                                                onClick={() => handleDeleteProduct(product._id)}
+                                            >
+                                                Delete
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="4">No products found.</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </Table>
+                </Card.Body>
+            </Card>
+
+            {/* Resources Section */}
+            <ResourceList />
+
+            {/* Aid Section */}
+            <AidList />
+        </div>
+    );
+};
+
+export default EntrepreneurDashboard;

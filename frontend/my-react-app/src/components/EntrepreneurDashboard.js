@@ -2,15 +2,20 @@ import React, { useEffect, useState } from 'react';
 import axiosInstance from '../api/axios'; // Import the Axios instance
 import ResourceList from './ResourceList';
 import AidList from './AidList';
+import Sessions from './Sessions';
+import '../assets/cssfiles/entre.css'
 
 const EntrepreneurDashboard = () => {
+    // State to manage the visibility of sections
+    const [showResources, setShowResources] = useState(false);
+    const [showAidPrograms, setShowAidPrograms] = useState(false);
     const [products, setProducts] = useState([]);
     const [editingProduct, setEditingProduct] = useState(null); // State to store the product being edited
     const [formData, setFormData] = useState({
         title: '',
         price: '',
         status: 'Available', // Default status
-        category: '', // Add category to form data
+        category: 'Handicrafts', // Add category to form data
         stock: '', // Add stock field
         description: ''
     });
@@ -22,8 +27,8 @@ const EntrepreneurDashboard = () => {
     const [mentors, setMentors] = useState([]);
     const [newSessionRequest, setNewSessionRequest] = useState({
         mentorId: '',
-        schedule: '',
-        topics: '',
+        schedule: '',  // Ensure this is an empty string initially
+        topics: '',    // Ensure this is an empty string initially
     });
 
     // Fetch products, mentors, and sessions
@@ -90,7 +95,6 @@ const EntrepreneurDashboard = () => {
         }));
     };
 
-
     // Handle form submission (Update product)
     const handleUpdateProduct = async (e) => {
         e.preventDefault();
@@ -116,7 +120,6 @@ const EntrepreneurDashboard = () => {
         try {
             const newProduct = {
                 ...formData,
-                // ownerId: 'kiran-bibi-id', // Assuming Kiran Bibi's ID here
             };
 
             const response = await axiosInstance.post('/dashboard/entrepreneur/products', newProduct);
@@ -134,115 +137,190 @@ const EntrepreneurDashboard = () => {
         }
     };
 
+    // Handle session request form input changes
+    const handleSessionRequestChange = (e) => {
+        const { name, value } = e.target;
+        setNewSessionRequest((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }));
+    };
+
+    // Handle session request form submission
+    const handleSessionRequestSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axiosInstance.post('/mentorship/mentee/sessions', newSessionRequest);
+            setSessions((prevState) => ({
+                ...prevState,
+                pendingSessions: [...prevState.pendingSessions, response.data.session],
+            }));
+            setNewSessionRequest({
+                mentorId: '',
+                schedule: '',
+                topics: '',
+            });
+        } catch (error) {
+            console.error('Error requesting session:', error);
+        }
+    };
+
     return (
-        <div className="dashboard">
-            <h2>Welcome, Entrepreneur</h2>
+        <div className="entrepreneur-dashboard-container my-4">
+            <h2 className="entrepreneur-dashboard-title text-center">Welcome, Entrepreneur</h2>
 
             {/* Add New Product Form */}
-            <div className="add-product-form">
-                <h3>Add New Product</h3>
-                <form onSubmit={handleAddNewProduct}>
-                    <label>Product Title</label>
-                    <input
-                        type="text"
-                        name="title"
-                        value={formData.title}
-                        onChange={handleInputChange}
-                        required
-                    />
-                    <label>Product Description</label>
-                    <input
-                        type="text"
-                        name="description"
-                        value={formData.description}
-                        onChange={handleInputChange}
-                        required
-                    />
-                    <label>Price</label>
-                    <input
-                        type="number"
-                        name="price"
-                        value={formData.price}
-                        onChange={handleInputChange}
-                        required
-                    />
-                    <label>Status</label>
-                    <select
-                        name="status"
-                        value={formData.status}
-                        onChange={handleInputChange}
-                        required
-                    >
-                        <option value="Available">Available</option>
-                        <option value="Out of Stock">Out of Stock</option>
-                        <option value="Discontinued">Discontinued</option>
-                    </select>
-                    <label>Category</label>
-                    <select
-                        name="category"
-                        value={formData.category}
-                        onChange={handleInputChange}
-                        required
-                    >
-                        <option value="Handicrafts">Handicrafts</option>
-                        <option value="Organic Produce">Organic Produce</option>
-                    </select>
-                    <label>Stock</label>
-                    <input
-                        type="number"
-                        name="stock"
-                        value={formData.stock}
-                        onChange={handleInputChange}
-                        required
-                    />
-                    <button type="submit">Add Product</button>
-                </form>
+            <div className="entrepreneur-dashboard-card card shadow-sm mb-4">
+                <div className="entrepreneur-dashboard-card-header card-header bg-primary text-white">
+                    <h3 className="m-0">Add New Product</h3>
+                </div>
+                <div className="entrepreneur-dashboard-card-body card-body">
+                    <form onSubmit={handleAddNewProduct} className="row g-3">
+                        <div className="col-md-6">
+                            <label className="form-label">Product Title</label>
+                            <input
+                                type="text"
+                                name="title"
+                                value={formData.title}
+                                onChange={handleInputChange}
+                                className="form-control"
+                                required
+                            />
+                        </div>
+                        <div className="col-md-6">
+                            <label className="form-label">Product Description</label>
+                            <input
+                                type="text"
+                                name="description"
+                                value={formData.description}
+                                onChange={handleInputChange}
+                                className="form-control"
+                                required
+                            />
+                        </div>
+                        <div className="col-md-6">
+                            <label className="form-label">Price</label>
+                            <input
+                                type="number"
+                                name="price"
+                                value={formData.price}
+                                onChange={handleInputChange}
+                                className="form-control"
+                                required
+                            />
+                        </div>
+                        <div className="col-md-6">
+                            <label className="form-label">Status</label>
+                            <select
+                                name="status"
+                                value={formData.status}
+                                onChange={handleInputChange}
+                                className="form-select"
+                                required
+                            >
+                                <option value="Available">Available</option>
+                                <option value="Out of Stock">Out of Stock</option>
+                                <option value="Discontinued">Discontinued</option>
+                            </select>
+                        </div>
+                        <div className="col-md-6">
+                            <label className="form-label">Category</label>
+                            <select
+                                name="category"
+                                value={formData.category}
+                                onChange={handleInputChange}
+                                className="form-select"
+                                required
+                            >
+                                <option value="Handicrafts">Handicrafts</option>
+                                <option value="Organic Produce">Organic Produce</option>
+                            </select>
+                        </div>
+                        <div className="col-md-6">
+                            <label className="form-label">Stock</label>
+                            <input
+                                type="number"
+                                name="stock"
+                                value={formData.stock}
+                                onChange={handleInputChange}
+                                className="form-control"
+                                required
+                            />
+                        </div>
+                        <div className="col-12">
+                            <button type="submit" className="entrepreneur-dashboard-btn btn btn-success w-100">Add Product</button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             {/* Edit Product Modal/Form */}
             {editingProduct && (
-                <div className="edit-product-form">
-                    <h3>Edit Product</h3>
-                    <form onSubmit={handleUpdateProduct}>
-                        <label>Product Title</label>
-                        <input
-                            type="text"
-                            name="title"
-                            value={formData.title}
-                            onChange={handleInputChange}
-                            required
-                        />
-                        <label>Price</label>
-                        <input
-                            type="number"
-                            name="price"
-                            value={formData.price}
-                            onChange={handleInputChange}
-                            required
-                        />
-                        <label>Status</label>
-                        <select
-                            name="status"
-                            value={formData.status}
-                            onChange={handleInputChange}
-                            required
-                        >
-                            <option value="Available">Available</option>
-                            <option value="Out of Stock">Out of Stock</option>
-                            <option value="Discontinued">Discontinued</option>
-                        </select>
-                        <button type="submit">Update Product</button>
-                        <button onClick={() => setEditingProduct(null)}>Cancel</button>
-                    </form>
+                <div className="entrepreneur-dashboard-card card shadow-sm mb-4">
+                    <div className="entrepreneur-dashboard-card-header card-header bg-warning text-white">
+                        <h3 className="m-0">Edit Product</h3>
+                    </div>
+                    <div className="entrepreneur-dashboard-card-body card-body">
+                        <form onSubmit={handleUpdateProduct} className="row g-3">
+                            <div className="col-md-6">
+                                <label className="form-label">Product Title</label>
+                                <input
+                                    type="text"
+                                    name="title"
+                                    value={formData.title}
+                                    onChange={handleInputChange}
+                                    className="form-control"
+                                    required
+                                />
+                            </div>
+                            <div className="col-md-6">
+                                <label className="form-label">Price</label>
+                                <input
+                                    type="number"
+                                    name="price"
+                                    value={formData.price}
+                                    onChange={handleInputChange}
+                                    className="form-control"
+                                    required
+                                />
+                            </div>
+                            <div className="col-md-6">
+                                <label className="form-label">Status</label>
+                                <select
+                                    name="status"
+                                    value={formData.status}
+                                    onChange={handleInputChange}
+                                    className="form-select"
+                                    required
+                                >
+                                    <option value="Available">Available</option>
+                                    <option value="Out of Stock">Out of Stock</option>
+                                    <option value="Discontinued">Discontinued</option>
+                                </select>
+                            </div>
+                            <div className="col-12">
+                                <button type="submit" className="entrepreneur-dashboard-btn btn btn-warning w-100">Update Product</button>
+                            </div>
+                            <div className="col-12">
+                                <button
+                                    type="button"
+                                    onClick={() => setEditingProduct(null)}
+                                    className="btn btn-secondary w-100"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             )}
 
-            <div>
+            <div className="table-responsive">
                 <h3>Your Products</h3>
-                <table>
+                <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th>Product Name</th>
+                            <th>Product</th>
                             <th>Price</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -256,8 +334,12 @@ const EntrepreneurDashboard = () => {
                                     <td>${product.price}</td>
                                     <td>{product.status}</td>
                                     <td>
-                                        <button onClick={() => handleEditProduct(product)}>Edit</button>
-                                        <button onClick={() => handleDeleteProduct(product._id)}>Delete</button>
+                                        <button onClick={() => handleEditProduct(product)} className="btn btn-info btn-sm mx-1">
+                                            Edit
+                                        </button>
+                                        <button onClick={() => handleDeleteProduct(product._id)} className="btn btn-danger btn-sm">
+                                            Delete
+                                        </button>
                                     </td>
                                 </tr>
                             ))
@@ -270,10 +352,38 @@ const EntrepreneurDashboard = () => {
                 </table>
             </div>
 
-            {/* Resources Section */}
-            <ResourceList />
-            {/* Financial Aid Programs Section */}
-            <AidList />
+            {/* Use the Sessions Component */}
+            <Sessions sessions={sessions} />
+
+            {/* Dropdown for Resources */}
+            <div className="entrepreneur-dashboard-dropdown-container">
+                <button
+                    className="entrepreneur-dashboard-dropdown-button"
+                    onClick={() => setShowResources(!showResources)}
+                >
+                    {showResources ? '▼ Hide Resources' : '▶ Explore Resources'}
+                </button>
+                {showResources && (
+                    <div className="entrepreneur-dashboard-dropdown-content">
+                        <ResourceList />
+                    </div>
+                )}
+            </div>
+
+            {/* Dropdown for Aid Programs */}
+            <div className="entrepreneur-dashboard-dropdown-container">
+                <button
+                    className="entrepreneur-dashboard-dropdown-button"
+                    onClick={() => setShowAidPrograms(!showAidPrograms)}
+                >
+                    {showAidPrograms ? '▼ Hide Aid Programs' : '▶ Explore Aid Programs'}
+                </button>
+                {showAidPrograms && (
+                    <div className="entrepreneur-dashboard-dropdown-content">
+                        <AidList />
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

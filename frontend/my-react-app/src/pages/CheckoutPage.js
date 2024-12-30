@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../api/axios';
 import { useNavigate } from 'react-router-dom';
+import '../assets/cssfiles/checkout.css'; // Assuming custom styles will be placed here
 
 const Checkout = () => {
     const [cart, setCart] = useState(null);
@@ -17,7 +18,7 @@ const Checkout = () => {
     const [paymentMethod, setPaymentMethod] = useState('');
     const [total, setTotal] = useState(0);
     const navigate = useNavigate();
-    const [submitted, setSubmitted] = useState(false); // Add this state
+    const [submitted, setSubmitted] = useState(false);
 
     // Fetch cart details on page load
     useEffect(() => {
@@ -25,7 +26,10 @@ const Checkout = () => {
             try {
                 const response = await axios.get('/cart', { withCredentials: true });
                 setCart(response.data);
-                const calculatedTotal = response.data.items.reduce((sum, item) => sum + item.productId.price * item.quantity, 0) + 1;
+                const calculatedTotal = response.data.items.reduce(
+                    (sum, item) => sum + item.productId.price * item.quantity,
+                    0
+                ) + 1;
                 setTotal(calculatedTotal);
             } catch (err) {
                 console.error('Error fetching cart:', err);
@@ -43,12 +47,12 @@ const Checkout = () => {
         setPaymentMethod(e.target.value);
     };
 
-    const handleSubmit = async () => {
-        if (submitted) return; // Prevent multiple submissions
-
-        setSubmitted(true); // Set submitted flag
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (submitted) return;
+        setSubmitted(true);
         try {
-            const filteredCartItems = cart.items.filter((item) => item.productId); // Filter out items with null productId
+            const filteredCartItems = cart.items.filter((item) => item.productId);
             const orderDetails = {
                 shippingInfo,
                 paymentMethod,
@@ -58,7 +62,6 @@ const Checkout = () => {
 
             const response = await axios.post('http://localhost:5000/api/checkout', orderDetails);
             if (response.status === 200) {
-                console.log('order successfulll');
                 navigate('/order-confirmation', { state: { order: response.data } });
             }
         } catch (error) {
@@ -68,9 +71,11 @@ const Checkout = () => {
     };
 
     const calculateTotalAmount = (cartItems) => {
-        return cartItems.reduce((total, item) => total + (item.productId?.price || 0) * item.quantity, 0);
+        return cartItems.reduce(
+            (total, item) => total + (item.productId?.price || 0) * item.quantity,
+            0
+        );
     };
-
 
     if (!cart) return <div>Loading...</div>;
 
@@ -84,25 +89,27 @@ const Checkout = () => {
                     placeholder="Email"
                     required
                     onChange={handleChange}
+                    className="input-field"
                 />
                 <div className="checkbox">
                     <label>
                         <input
                             type="checkbox"
                             name="saveInfo"
-                            onChange={() => setShippingInfo({ ...shippingInfo, saveInfo: !shippingInfo.saveInfo })}
+                            onChange={() =>
+                                setShippingInfo({ ...shippingInfo, saveInfo: !shippingInfo.saveInfo })
+                            }
                         />
                         Save this information for next time
                     </label>
                 </div>
 
                 <h2>Delivery</h2>
-                <select name="city" required onChange={handleChange}>
+                <select name="city" required onChange={handleChange} className="input-field">
                     <option value="">Select City</option>
                     <option value="Karachi">Karachi</option>
                     <option value="Lahore">Lahore</option>
                     <option value="Islamabad">Islamabad</option>
-                    {/* Add more cities here */}
                 </select>
 
                 <input
@@ -111,6 +118,7 @@ const Checkout = () => {
                     placeholder="First name"
                     required
                     onChange={handleChange}
+                    className="input-field"
                 />
                 <input
                     type="text"
@@ -118,6 +126,7 @@ const Checkout = () => {
                     placeholder="Last name"
                     required
                     onChange={handleChange}
+                    className="input-field"
                 />
                 <input
                     type="text"
@@ -125,18 +134,21 @@ const Checkout = () => {
                     placeholder="Address"
                     required
                     onChange={handleChange}
+                    className="input-field"
                 />
                 <input
                     type="text"
                     name="apartment"
                     placeholder="Apartment, suite, etc. (optional)"
                     onChange={handleChange}
+                    className="input-field"
                 />
                 <input
                     type="text"
                     name="postalCode"
                     placeholder="Postal code (optional)"
                     onChange={handleChange}
+                    className="input-field"
                 />
                 <input
                     type="text"
@@ -144,15 +156,16 @@ const Checkout = () => {
                     placeholder="Phone"
                     required
                     onChange={handleChange}
+                    className="input-field"
                 />
 
                 <h2>Shipping Method</h2>
-                <select>
+                <select className="input-field">
                     <option value="freeShipping">FREE SHIPPING + FBR POS</option>
                 </select>
 
                 <h2>Payment</h2>
-                <div>
+                <div className="payment-methods">
                     <label>
                         <input
                             type="radio"
@@ -174,17 +187,17 @@ const Checkout = () => {
                 </div>
 
                 <h2>Order Summary</h2>
-                <div>
+                <div className="order-summary">
                     {cart.items.map((item, index) => (
                         item.productId ? (
-                            <div key={index}>
-                                <img src={item.productId.image} alt={item.productId.name} />
-                                <span>{item.productId.name}</span>
-                                <span>Qty: {item.quantity}</span>
-                                <span>Price: Rs {item.productId.price}</span>
+                            <div key={index} className="order-item">
+                                <img src={item.productId.image} alt={item.productId.name} className="item-image" />
+                                <span className="item-name">{item.productId.name}</span>
+                                <span className="item-qty">Qty: {item.quantity}</span>
+                                <span className="item-price">Rs {item.productId.price}</span>
                             </div>
                         ) : (
-                            <div key={index}>
+                            <div key={index} className="order-item">
                                 <span>Product details unavailable</span>
                                 <span>Qty: {item.quantity}</span>
                             </div>
@@ -192,14 +205,13 @@ const Checkout = () => {
                     ))}
                 </div>
 
-
                 <div className="cost-summary">
                     <div>Subtotal: Rs {total - 1}</div>
                     <div>Shipping: Rs 1.00</div>
                     <div>Total: Rs {total}</div>
                 </div>
 
-                <button type="submit">Submit Order</button>
+                <button type="submit" className="submit-btn">Submit Order</button>
             </form>
         </div>
     );

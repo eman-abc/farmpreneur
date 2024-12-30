@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext'; // Import the custom auth context hook
 import axiosInstance from '../api/axios';
 import { useNavigate, useLocation } from 'react-router-dom';
+import '../assets/cssfiles/marketplace.css'; // Ensure you import the correct CSS
 
 const MarketplacePage = () => {
     const { user, loading } = useAuth(); // Access user and loading from AuthContext
@@ -11,7 +12,7 @@ const MarketplacePage = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [cart, setCart] = useState([]);
     const location = useLocation();
-    const navigate = useNavigate(); // Hook to navigate programmatically
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -31,51 +32,35 @@ const MarketplacePage = () => {
 
     const handleAddToCart = async (product) => {
         if (!user) {
-            // If the user is not logged in, save the current page location and redirect to login
             navigate('/login', { state: { from: location.pathname } });
             return;
         }
 
-        console.log("User from context:", user); // Ensure user is being fetched from context
-        console.log('Adding to cart, Product ID:', product._id, 'Quantity:', 1);
-
-        if (!product || !product._id) {
-            console.error("Product ID is missing or undefined.");
-            return;
-        }
-
         try {
-            // Send the product and quantity to the backend to add to the cart
             const response = await axiosInstance.post(
                 'cart/add',
-                { productId: product._id, quantity: 1 }, // Correctly set productId and quantity
+                { productId: product._id, quantity: 1 },
                 {
-                    withCredentials: true,  // Include cookies with the request
+                    withCredentials: true,
                     headers: {
-                        'Content-Type': 'application/json',  // Ensure it's sent as JSON
+                        'Content-Type': 'application/json',
                     },
                 }
             );
-
-            console.log('Added to cart:', response.data);
             alert(`${product.title} has been added to your cart!`);
         } catch (error) {
             console.error('Error adding to cart:', error.response?.data || error.message);
         }
     };
 
-
-
-    // Handle Card Click (Navigate to Product Details)
     const handleCardClick = (productId) => {
         navigate(`/products/${productId}`);
     };
 
-    // Show loading spinner/message if still loading
     if (loading) return <div>Loading...</div>;
 
     return (
-        <div className="container my-4">
+        <div className="marketplace-container mt-4">
             <h1 className="text-primary">Marketplace</h1>
 
             <div className="row mb-4">
@@ -122,19 +107,20 @@ const MarketplacePage = () => {
             <div className="row">
                 {products.map((product) => (
                     <div key={product._id} className="col-md-4 mb-4">
-                        <div className="card shadow h-100" onClick={() => handleCardClick(product._id)}>
+                        <div className="card shadow h-100 marketplace-card" onClick={() => handleCardClick(product._id)}>
                             <img
                                 src={product.imageUrl[0]}
-                                className="card-img-top"
+                                className="card-img-top marketplace-card-img"
                                 alt={product.title}
                             />
-                            <div className="card-body">
+                            <div className="card-body marketplace-card-body">
                                 <h5 className="card-title">{product.title}</h5>
-                                <p className="card-text">Price: ${product.price}</p>
+                                <p className="card-text">Price: ₨{product.price}</p>
+
                                 <button
                                     className="btn btn-primary"
                                     onClick={(e) => {
-                                        e.stopPropagation(); // Prevent triggering the card click
+                                        e.stopPropagation(); 
                                         handleAddToCart(product);
                                     }}
                                 >
@@ -146,7 +132,7 @@ const MarketplacePage = () => {
                 ))}
             </div>
 
-            <div className="d-flex justify-content-between mt-4">
+            <div className="d-flex justify-content-between mt-4 marketplace-pagination">
                 <button
                     className="btn btn-secondary"
                     disabled={page <= 1}

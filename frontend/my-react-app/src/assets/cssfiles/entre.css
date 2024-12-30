@@ -1,0 +1,214 @@
+/* entrepreneur.css */
+
+/* General Styles */
+.entrepreneur-dashboard-container {
+    margin: 2rem auto;
+    max-width: 1200px;
+    padding: 1rem;
+    /* background-color: #EDE1D2; */
+    /* Butter (creamy beige) for background */
+}
+
+.entrepreneur-dashboard-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #412F26;
+    /* Cocoa (dark brown) for title text */
+}
+
+/* Card Styling */
+.entrepreneur-dashboard-card {
+    margin-bottom: 1.5rem;
+    /* background-color: #EDE1D2; */
+    /* Coconut (off-white) for card background */
+}
+
+.entrepreneur-dashboard-card-header {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #6A6F4C;
+    /* Organic (muted olive green) for header text */
+}
+
+.entrepreneur-dashboard-card-body {
+    padding: 1.5rem;
+    /* background-color: #EDE1D2; */
+    /* Butter (creamy beige) for card body */
+    border-radius: 5px;
+}
+
+/* Form Styling */
+.form-label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #412F26;
+    /* Cocoa (dark brown) for label text */
+}
+
+.form-control,
+.form-select {
+    border-radius: 5px;
+    padding: 0.75rem;
+    border: 1px solid #6A6F4C;
+    /* Organic (muted olive green) for form borders */
+}
+
+.entrepreneur-dashboard-btn {
+    font-weight: bold;
+    padding: 0.75rem;
+    border-radius: 5px;
+    background-color: #5D2510;
+    /* Palm Oil (deep reddish-brown) for buttons */
+    color: white;
+}
+
+.entrepreneur-dashboard-btn:focus {
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Table Styling */
+.table-responsive {
+    margin-top: 2rem;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #6A6F4C;
+    /* Organic (muted olive green) for table borders */
+}
+
+.table-striped tbody tr:nth-child(odd) {
+    background-color: #EDE1D2;
+    /* Coconut (off-white) for odd rows */
+}
+
+.table-striped tbody tr:nth-child(even) {
+    background-color: #CBB89D;
+    /* Butter (creamy beige) for even rows */
+}
+
+.btn-sm {
+    font-size: 0.875rem;
+    padding: 0.5rem;
+}
+
+/* Dropdown Button Styling */
+.entrepreneur-dashboard-dropdown-container {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.entrepreneur-dashboard-dropdown-button {
+    background-color: #5D2510;
+    /* Palm Oil (deep reddish-brown) for button */
+    color: white;
+    font-weight: bold;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.entrepreneur-dashboard-dropdown-button:hover {
+    background-color: #412F26;
+    /* Cocoa (dark brown) for hover effect */
+}
+
+.entrepreneur-dashboard-dropdown-content {
+    margin-top: 1rem;
+    background-color: #EDE1D2;
+    /* Coconut (off-white) for dropdown content */
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.entrepreneur-dashboard-dropdown-content ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.entrepreneur-dashboard-dropdown-content li {
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #6A6F4C;
+    /* Organic (muted olive green) for border */
+}
+
+.entrepreneur-dashboard-dropdown-content li:hover {
+    background-color: #5D2510;
+    /* Palm Oil (deep reddish-brown) for hover effect */
+    color: white;
+}
+
+/* Button Colors */
+.btn-danger {
+    background-color: #C82333;
+    /* Custom red for danger */
+    border: none;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #5D2510;
+    /* Palm Oil (deep reddish-brown) for hover */
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    /* Custom info blue */
+    border: none;
+    color: white;
+}
+
+.btn-info:hover {
+    background-color: #138496;
+    /* Custom hover info color */
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    /* Custom yellow for warning */
+    border: none;
+    color: black;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+    /* Custom hover yellow for warning */
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    /* Custom grey for secondary */
+    border: none;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    /* Custom hover grey for secondary */
+}
+
+/* Modal Styles (Edit Product Form) */
+.entrepreneur-dashboard-card-header.bg-warning {
+    background-color: #ffcc00;
+    /* Custom yellow for modal header */
+}
+
+.entrepreneur-dashboard-btn.btn-warning {
+    background-color: #ffcc00;
+    /* Custom yellow for button */
+    border: none;
+}
+
+.entrepreneur-dashboard-btn.btn-warning:hover {
+    background-color: #e0a800;
+    /* Custom hover yellow for button */
+}

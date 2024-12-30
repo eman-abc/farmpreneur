@@ -10,6 +10,8 @@ import CheckoutPage from './pages/CheckoutPage';
 import OrderConfirmationPage from './pages/OrderConfirmationPage';
 import Footer from './components/Footer';
 import Header from './components/Header';
+import AboutPage from './pages/About';
+import './App.css';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -48,7 +50,7 @@ const AppRoutes = () => {
 
                 {/* Login page is public */}
                 <Route path="/login" element={<LoginPage />} />
-
+                <Route path="/about" element={<AboutPage />} />
                 {/* Protect the dashboard route */}
                 <Route
                     path="/dashboard"

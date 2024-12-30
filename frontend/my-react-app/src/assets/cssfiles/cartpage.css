@@ -1,0 +1,203 @@
+/* Cart Page Styles */
+
+/* Container for the cart page */
+.cart-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #EDE1D2;
+    /* Coconut - Soft off-white background */
+    padding: 20px;
+}
+
+/* Card styling */
+.card-registration-2 {
+    border-radius: 15px;
+    background-color: #CBB89D;
+    /* Butter - Creamy beige */
+}
+
+/* Card body padding */
+.card-registration-2 .p-0 {
+    padding: 0;
+}
+
+/* Shopping cart header */
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Header typography */
+.cart-header h1 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #412F26;
+    /* Cocoa - Rich dark brown */
+}
+
+.cart-header .text-muted {
+    color: #806044;
+    /* Natural - Warm brown */
+}
+
+/* Cart item row */
+.cart-item {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #806044;
+    /* Natural - Warm brown */
+    padding: 15px 0;
+}
+
+/* Cart item image */
+.cart-item-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Product details */
+.cart-item-details {
+    flex: 1;
+    padding-left: 15px;
+}
+
+.cart-item-details h6 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #412F26;
+    /* Cocoa - Rich dark brown */
+}
+
+/* Quantity section */
+.cart-item-quantity {
+    display: flex;
+    align-items: center;
+}
+
+/* Buttons for quantity adjustment */
+.cart-item-quantity .btn {
+    margin: 0 5px;
+    background-color: #6A6F4C;
+    /* Organic - Muted olive green */
+    color: #EDE1D2;
+    /* Coconut - Soft off-white */
+    border-radius: 5px;
+    padding: 5px 10px;
+    transition: background-color 0.3s ease;
+}
+
+.cart-item-quantity .btn:hover {
+    background-color: #5D2510;
+    /* Palm Oil - Deep reddish-brown */
+}
+
+/* Cart item price */
+.cart-item-price {
+    font-size: 18px;
+    color: #412F26;
+    /* Cocoa - Rich dark brown */
+}
+
+/* Remove item button */
+.cart-item-remove {
+    cursor: pointer;
+    color: #5D2510;
+    /* Palm Oil - Deep reddish-brown */
+}
+
+/* Remove item icon hover effect */
+.cart-item-remove:hover {
+    color: #CBB89D;
+    /* Butter - Creamy beige */
+}
+
+/* Summary section */
+.cart-summary {
+    background-color: #EDE1D2;
+    /* Coconut - Soft off-white */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Summary header */
+.cart-summary h3 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #412F26;
+    /* Cocoa - Rich dark brown */
+    margin-bottom: 20px;
+}
+
+/* Total price section */
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+/* Total price labels */
+.cart-total h5 {
+    font-size: 18px;
+    font-weight: normal;
+    color: #806044;
+    /* Natural - Warm brown */
+}
+
+/* Total price value */
+.cart-total .total-price {
+    font-size: 22px;
+    font-weight: bold;
+    color: #412F26;
+    /* Cocoa - Rich dark brown */
+}
+
+/* Checkout button */
+.checkout-btn {
+    background-color: #6A6F4C !important;
+    /* Organic - Muted olive green */
+    color: #EDE1D2;
+    /* Coconut - Soft off-white */
+    padding: 12px 20px;
+    font-size: 18px;
+    border-radius: 5px;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.checkout-btn:hover {
+    background-color: #6A6F4C !important;
+    /* Palm Oil - Deep reddish-brown */
+}
+
+/* No image message */
+.no-image {
+    font-size: 14px;
+    color: #806044;
+    /* Natural - Warm brown */
+    font-style: italic;
+    text-align: center;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cart-item-details {
+        padding-left: 0;
+    }
+
+    .cart-item-quantity {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

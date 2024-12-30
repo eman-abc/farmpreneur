@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../api/axios'; // Assuming you have a custom axios instance
-
+import '../assets/cssfiles/mentor.css'
 const MentorDashboard = () => {
     const [mentorshipSessions, setMentorshipSessions] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -183,19 +183,17 @@ const MentorDashboard = () => {
             setError(err.response?.data?.message || 'Error editing topic');
         }
     };
-    
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>{error}</div>;
 
     return (
-        <div>
-            <h2>Your Mentorship Topics</h2>
-
+        <div className="container mt-4 mentor-dashboard">
+            <h2 className="text-center">Your Mentorship Topics</h2>
             <div className="row mb-4">
                 {mentorshipTopics.map((topic) => (
                     <div className="col-md-4 mb-3" key={topic._id}>
-                        <div className="card">
+                        <div className="card topic-card">
                             <div className="card-body">
                                 <h5 className="card-title">{topic.title}</h5>
                                 <p className="card-text">{topic.description}</p>
@@ -203,7 +201,7 @@ const MentorDashboard = () => {
                                     <small className="text-muted">Category: {topic.category}</small>
                                 </p>
                                 <button
-                                    className="btn btn-warning me-2"
+                                    className="btn btn-warning topic-btn me-2"
                                     onClick={() => {
                                         setEditTopicId(topic._id);
                                         setNewTopic({
@@ -216,7 +214,7 @@ const MentorDashboard = () => {
                                     Edit
                                 </button>
                                 <button
-                                    className="btn btn-danger"
+                                    className="btn btn-danger topic-btn"
                                     onClick={() => handleRemoveTopic(topic._id)}
                                 >
                                     Remove
@@ -227,23 +225,23 @@ const MentorDashboard = () => {
                 ))}
             </div>
 
-            <h3>{editTopicId ? 'Edit Topic' : 'Add New Topic'}</h3>
+            <h3 className="text-center">{editTopicId ? 'Edit Topic' : 'Add New Topic'}</h3>
             <div className="mb-3">
                 <input
                     type="text"
-                    className="form-control mb-2"
+                    className="form-control mb-2 topic-input"
                     placeholder="Title"
                     value={newTopic.title}
                     onChange={(e) => setNewTopic({ ...newTopic, title: e.target.value })}
                 />
                 <textarea
-                    className="form-control mb-2"
+                    className="form-control mb-2 topic-input"
                     placeholder="Description"
                     value={newTopic.description}
                     onChange={(e) => setNewTopic({ ...newTopic, description: e.target.value })}
                 ></textarea>
                 <select
-                    className="form-select mb-2"
+                    className="form-select mb-2 topic-input"
                     value={newTopic.category}
                     onChange={(e) => setNewTopic({ ...newTopic, category: e.target.value })}
                 >
@@ -259,16 +257,17 @@ const MentorDashboard = () => {
                     <option value="Technology for Women Entrepreneurs">Technology for Women Entrepreneurs</option>
                 </select>
                 <button
-                    className={`btn ${editTopicId ? 'btn-success' : 'btn-primary'}`}
+                    className={`btn ${editTopicId ? 'btn-success' : 'btn-primary'} topic-btn`}
                     onClick={editTopicId ? handleEditTopic : handleAddTopic}
                 >
                     {editTopicId ? 'Save Changes' : 'Add Topic'}
                 </button>
             </div>
+
             <h2>Your Mentorship Sessions</h2>
-            <ul>
+            <ul className="session-list">
                 {mentorshipSessions.map((session) => (
-                    <li key={session._id}>
+                    <li key={session._id} className="session-item">
                         <strong>Session with: {session.menteeId.name}</strong>
                         <div>Scheduled: {new Date(session.schedule).toLocaleString()}</div>
                         <div>Status: {session.status}</div>
@@ -276,19 +275,27 @@ const MentorDashboard = () => {
                         {session.menteeFeedback && <div>Mentee Feedback: {session.menteeFeedback}</div>}
 
                         {session.status === 'Pending' && (
-                            <button onClick={() => handleApproveSession(session._id)}>Approve</button>
+                            <button
+                                className="btn btn-success session-btn"
+                                onClick={() => handleApproveSession(session._id)}
+                            >
+                                Approve
+                            </button>
                         )}
 
                         {session.status === 'Approved' && (
                             <form onSubmit={handleCompleteSession}>
                                 <textarea
+                                    className="form-control session-feedback"
                                     placeholder="Enter feedback"
                                     value={feedbackData.sessionId === session._id ? feedbackData.feedback : ''}
                                     onChange={(e) =>
                                         setFeedbackData({ sessionId: session._id, feedback: e.target.value })
                                     }
                                 ></textarea>
-                                <button type="submit">Mark as Completed</button>
+                                <button type="submit" className="btn btn-primary session-btn">
+                                    Mark as Completed
+                                </button>
                             </form>
                         )}
 
@@ -296,12 +303,18 @@ const MentorDashboard = () => {
                             <div>
                                 <input
                                     type="datetime-local"
+                                    className="form-control session-schedule"
                                     value={rescheduleData.sessionId === session._id ? rescheduleData.newSchedule : ''}
                                     onChange={(e) =>
                                         setRescheduleData({ sessionId: session._id, newSchedule: e.target.value })
                                     }
                                 />
-                                <button onClick={() => handleRescheduleSession(session._id)}>Reschedule</button>
+                                <button
+                                    className="btn btn-info session-btn"
+                                    onClick={() => handleRescheduleSession(session._id)}
+                                >
+                                    Reschedule
+                                </button>
                             </div>
                         )}
                     </li>
@@ -312,4 +325,3 @@ const MentorDashboard = () => {
 };
 
 export default MentorDashboard;
-

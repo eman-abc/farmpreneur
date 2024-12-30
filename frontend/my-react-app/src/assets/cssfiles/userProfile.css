@@ -1,0 +1,52 @@
+/* Custom color classes based on the palette */
+/* Custom color classes based on the palette */
+.user-profile {
+    background-color: #EDE1D2;
+    /* Coconut background for card */
+    border: 0;
+}
+
+.user-profile-img {
+    object-fit: cover;
+    height: 200px;
+    width: 200px;
+    border-radius: 50%;
+    margin: 20px auto;
+    border: 4px solid #CBB89D;
+    /* Butter color border */
+}
+
+.user-profile-body {
+    text-align: center;
+    background-color: #EDE1D2;
+    /* Coconut */
+}
+
+.user-profile-name {
+    color: #5D2510;
+    /* PalmOil color for name */
+    font-size: 1.5rem;
+}
+
+.user-profile-role {
+    color: #806044;
+    /* Natural color for role */
+    margin-bottom: 15px;
+}
+
+.user-profile-info {
+    color: #412F26;
+    /* Cocoa for info text */
+    font-size: 1rem;
+}
+
+.user-profile-footer {
+    background-color: #CBB89D;
+    /* Butter for footer */
+}
+
+.user-profile-footer-item {
+    background-color: #CBB89D;
+    color: #412F26;
+    /* Cocoa for footer text */
+}

@@ -1,85 +1,155 @@
-/* Background gradient */
+/* Background gradient with Organic and Butter tones */
 .background-radial-gradient {
     background-image: radial-gradient(650px circle at 0% 0%,
-            hsl(218, 41%, 35%) 15%,
-            hsl(218, 41%, 30%) 35%,
-            hsl(218, 41%, 20%) 75%,
-            hsl(218, 41%, 19%) 80%,
+            #6A6F4C 15%,
+            /* Organic */
+            #CBB89D 35%,
+            /* Butter */
+            #EDE1D2 75%,
+            /* Coconut */
             transparent 100%),
         radial-gradient(1250px circle at 100% 100%,
-            hsl(218, 41%, 45%) 15%,
-            hsl(218, 41%, 30%) 35%,
-            hsl(218, 41%, 20%) 75%,
-            hsl(218, 41%, 19%) 80%,
-            transparent 100%),
-        /* Apply image as background */
-        background-size cover,
-        /* Ensure the image covers the whole background */
-        background-position center center;
-    /* Center the image */
-    ;
-}
-
-.MDBContainer {
-    min-height: 100vh;
-    /* Ensures the container fills the full height */
+            #6A6F4C 15%,
+            /* Organic */
+            #CBB89D 35%,
+            /* Butter */
+            #EDE1D2 75%,
+            /* Coconut */
+            transparent 100%);
     background-size: cover;
     background-position: center center;
+    min-height: 100vh;
 }
 
 /* Glassmorphism effect */
 .bg-glass {
-    background-color: hsla(0, 0%, 100%, 0.9) !important;
-    backdrop-filter: saturate(200%) blur(25px);
+    background-color: hsla(0, 0%, 100%, 0.8) !important;
+    backdrop-filter: saturate(200%) blur(20px);
     border-radius: 10px;
-    /* Optional, to round the corners of the card */
+    border: 1px solid #CBB89D;
+    /* Butter border */
 }
 
-/* Adjustments for text */
+/* Text adjustments */
 h1 {
-    color: hsl(218, 81%, 95%);
+    color: #5D2510;
+    /* Palm Oil */
+    font-weight: 700;
 }
 
 h1 span {
-    color: hsla(180, 5%, 4%, 0.527);
+    color: #806044;
+    /* Natural */
+    font-style: italic;
 }
 
 p {
-    color: hsla(240, 6%, 7%, 0.751);
+    color: #412F26;
+    /* Cocoa */
+    font-size: 1.1em;
+    line-height: 1.5;
 }
 
 /* Input styling */
 .MDBInput {
     border-radius: 8px;
+    border: 1px solid #CBB89D;
+    /* Butter border */
+    padding: 10px;
+    font-size: 1em;
 }
 
 /* Button styling */
 .MDBBtn {
-    background-color: rgb(230, 104, 14) !important;
-    color: white !important;
-    border-radius: 10px;
+    background-color: #806044 !important;
+    /* Natural */
+    color: #EDE1D2 !important;
+    /* Coconut */
+    border-radius: 8px;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
 }
 
-.MDBContainer .MDBBtn {
-    background-color: rgb(230, 104, 14) !important;
+.MDBBtn:hover {
+    background-color: #5D2510 !important;
+    /* Palm Oil */
+    color: #EDE1D2 !important;
+    /* Coconut */
 }
-
-.MDBContainer .MDBBtn:hover {
-    background-color: orangered !important;
-}
-
 
 /* Error message styling */
 .text-danger {
-    font-size: 1.1em;
+    font-size: 1em;
+    color: #5D2510;
+    /* Palm Oil */
 }
 
 /* Form adjustments */
 form {
-    padding: 15px;
+    padding: 20px;
 }
 
-/* Text center alignment */
+/* Card shadow and borders */
+.MDBCard {
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #CBB89D;
+    /* Butter border */
+}
+
+/* Text alignment */
 .text-center {
     text-align: center;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Adjustments for the registration toggle button */
+.MDBBtn.outline {
+    background-color: transparent !important;
+    border: 1px solid #806044 !important;
+    /* Natural */
+    color: #806044 !important;
+    /* Natural */
+}
+
+.MDBBtn.outline:hover {
+    background-color: #806044 !important;
+    /* Natural */
+    color: #EDE1D2 !important;
+    /* Coconut */
+}
+
+/* Specific adjustments for labels */
+label {
+    color: #412F26;
+    /* Cocoa */
+    font-weight: 600;
+}
+
+/* General adjustments */
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Radius shapes for background enhancement */
+#radius-shape-1,
+#radius-shape-2 {
+    position: absolute;
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    background: #CBB89D;
+    /* Butter */
+}
+
+#radius-shape-1 {
+    width: 200px;
+    height: 200px;
+    top: -50px;
+    left: -50px;
+}
+
+#radius-shape-2 {
+    width: 300px;
+    height: 300px;
+    bottom: -50px;
+    right: -50px;
 }

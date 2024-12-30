@@ -1,0 +1,42 @@
+.aid-list {
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+.aid-item {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.aid-item h3 {
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.aid-item p {
+    font-size: 1rem;
+    color: #555;
+}
+
+.aid-item strong {
+    color: #333;
+}
+
+.loading {
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+.error {
+    color: red;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.no-programs {
+    text-align: center;
+    font-size: 1.2rem;
+}

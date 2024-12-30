@@ -26,9 +26,7 @@ function Header() {
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="ms-auto">
                             {user && <Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>}
-                            <Nav.Link as={Link} to="/skill-resource">Skill Resource</Nav.Link>
                             <Nav.Link as={Link} to="/marketplace">Marketplace</Nav.Link>
-                            <Nav.Link as={Link} to="/mentorship">Mentorship</Nav.Link>
                             <Nav.Link as={Link} to="/about">About</Nav.Link>
 
                             {/* Cart Button with Icon */}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import '../assets/cssfiles/aidList.css';  // Import the CSS file
 
 function AidList() {
     const [programs, setPrograms] = useState([]);
@@ -22,21 +23,21 @@ function AidList() {
     }, []);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <div className="loading">Loading...</div>;
     }
 
     if (error) {
-        return <div>{error}</div>;
+        return <div className="error">{error}</div>;
     }
 
     if (!programs || programs.length === 0) {
-        return <div>No financial aid programs available.</div>;
+        return <div className="no-programs">No financial aid programs available.</div>;
     }
 
     return (
-        <div>
+        <div className="aid-list">
             {programs.map((program) => (
-                <div key={program._id}>
+                <div key={program._id} className="aid-item">
                     <h3>{program.title}</h3>
                     <p>{program.description}</p>
                     <p><strong>Eligibility Criteria:</strong> {program.eligibilityCriteria}</p>
